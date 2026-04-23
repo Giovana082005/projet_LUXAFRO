@@ -5,7 +5,7 @@ Application web pour l'association Luxafro : plateforme dédiée à la promotion
 ##  Stack technique
 
 - **Backend** : Laravel 11 (PHP 8.3)
-- **Frontend** : React 18 + Vite + TypeScript
+- **Frontend** : React 18 + Vite 
 - **Base de données** : MySQL 8
 - **Conteneurisation** : Docker + Docker Compose
 
