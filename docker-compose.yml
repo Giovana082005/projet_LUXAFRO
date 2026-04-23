@@ -1,0 +1,40 @@
+services:
+  # Service MySQL (base de données)
+  mysql:
+    image: mysql:8.0
+    container_name: luxafro_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: luxafro
+      MYSQL_USER: luxafro_user
+      MYSQL_PASSWORD: luxafro_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - luxafro_network
+
+  # Service phpMyAdmin (interface web pour MySQL)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: luxafro_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - luxafro_network
+
+networks:
+  luxafro_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
