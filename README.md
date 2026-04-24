@@ -4,7 +4,7 @@ Application web pour l'association Luxafro : plateforme dédiée à la promotion
 
 ##  Stack technique
 
-- **Backend** : Laravel 11 (PHP 8.3)
+- **Backend** : Laravel 13 (PHP 8.4)
 - **Frontend** : React 18 + Vite 
 - **Base de données** : MySQL 8
 - **Conteneurisation** : Docker + Docker Compose
@@ -24,6 +24,19 @@ git clone https://github.com/Giovana082005/projet_LUXAFRO.git
 cd luxafro
 \`\`\`
 
+
+### 2. Lancer les services Docker
+
+\`\`\`bash
+docker compose up -d
+\`\`\`
+
+### 3. Accéder aux services
+
+- **phpMyAdmin** : http://localhost:8080
+- **Backend Laravel** : http://localhost:8000 
+- **Frontend React** : http://localhost:5173 
+
 ## Structure du projet
 
 \`\`\`
@@ -34,5 +47,3 @@ luxafro/
 ├── .gitignore
 └── README.md
 \`\`\`
-
-
