@@ -31,7 +31,7 @@ services:
       - mysql
     networks:
       - luxafro_network
-  
+
   # Service Laravel (Backend API)
   laravel:
     build:
@@ -46,6 +46,21 @@ services:
       - /var/www/html/vendor
     depends_on:
       - mysql
+    networks:
+      - luxafro_network
+
+  # Service React (Frontend)
+  react:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: luxafro_react
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     networks:
       - luxafro_network
 
