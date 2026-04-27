@@ -25,17 +25,27 @@ cd luxafro
 \`\`\`
 
 
-### 2. Lancer les services Docker
+### 2. Copier le fichier .env d'exemple
+cd backend
+cp .env.example .env
+cd ..
 
+### 3. Lancer les services Docker
 \`\`\`bash
 docker compose up -d
 \`\`\`
+### 4. GÉNÉRER SA PROPRE CLÉ LARAVEL
+docker compose exec laravel php artisan key:generate
 
-### 3. Accéder aux services
+### 5. Lancer les migrations
+docker compose exec laravel php artisan migrate
+
+### 6. Accéder aux services
 
 - **phpMyAdmin** : http://localhost:8080
 - **Backend Laravel** : http://localhost:8000 
 - **Frontend React** : http://localhost:5173 
+
 
 ## Structure du projet
 
