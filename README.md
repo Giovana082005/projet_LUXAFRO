@@ -57,3 +57,6 @@ luxafro/
 ├── .gitignore
 └── README.md
 \`\`\`
+
+### 7. créer un controller
+docker compose exec laravel php artisan make:controller nom_du_controller
