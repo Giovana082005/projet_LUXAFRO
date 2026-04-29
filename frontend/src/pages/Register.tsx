@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import type { AuthResponse } from "../types/User";
 
 function Register() {
@@ -7,6 +8,8 @@ function Register() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
 
   const handleRegister = async () => {
     setLoading(true);
@@ -27,10 +30,16 @@ function Register() {
       if (!res.ok) {
         setMessage(data.message || "Erreur inscription");
       } else {
-        // Stocker le token dans le navigateur
+        // Stocker le token
         localStorage.setItem("auth_token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
-        setMessage("Compte créé avec succès !");
+        setSuccess(true);
+        setMessage(" Compte créé avec succès !");
+        
+        // Rediriger vers /login après 2 secondes
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
       }
     } catch {
       setMessage("Erreur serveur");
@@ -40,44 +49,78 @@ function Register() {
   };
 
   return (
-    <div>
-      <h2>Inscription</h2>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+        <h2 className="text-3xl font-bold mb-6 text-center">Inscription</h2>
 
-      <input
-        type="text"
-        placeholder="Nom"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        disabled={loading}
-      />
+        {!success ? (
+          // Formulaire d'inscription
+          <>
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Nom complet"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                disabled={loading}
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
 
-      <br />
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
 
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        disabled={loading}
-      />
+              <input
+                type="password"
+                placeholder="Mot de passe (min. 6 caractères)"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
 
-      <br />
+              <button
+                onClick={handleRegister}
+                disabled={loading}
+                className="w-full bg-green-500 hover:bg-green-600 text-white p-3 rounded-lg font-semibold transition disabled:bg-gray-300"
+              >
+                {loading ? " Inscription..." : "S'inscrire"}
+              </button>
+            </div>
 
-      <input
-        type="password"
-        placeholder="Mot de passe"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        disabled={loading}
-      />
+            {message && (
+              <p className="mt-4 text-center text-red-600">{message}</p>
+            )}
 
-      <br />
-
-      <button onClick={handleRegister} disabled={loading}>
-        {loading ? "⏳ Inscription..." : "S'inscrire"}
-      </button>
-
-      <p>{message}</p>
+            <p className="mt-6 text-center text-gray-600">
+              Déjà un compte ?{" "}
+              <Link to="/login" className="text-blue-500 hover:underline">
+                Se connecter
+              </Link>
+            </p>
+          </>
+        ) : (
+          // Message de succès
+          <div className="text-center space-y-4">
+            <div className="bg-green-50 border border-green-300 rounded-lg p-6">
+              <h3 className="text-2xl font-semibold mb-2">
+                 Inscription réussie !
+              </h3>
+              <p className="text-gray-700">
+                Votre compte a été créé avec succès.
+              </p>
+              <p className="text-sm text-gray-500 mt-4">
+                Redirection vers la page de connexion...
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
