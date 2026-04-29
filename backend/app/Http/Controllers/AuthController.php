@@ -25,9 +25,13 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Génération du token Sanctum
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         return response()->json([
             'message' => 'Utilisateur créé avec succès',
-            'user' => $user
+            'user' => $user,
+            'token' => $token, //On envoie le token à React
         ], 201);
     }
 
@@ -49,17 +53,34 @@ class AuthController extends Controller
             ], 401);
         }
 
+        // Génération du token Sanctum
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         return response()->json([
             'message' => 'Connexion réussie',
-            'user' => $user
+            'user' => $user,
+            'token' => $token, //On envoie le token à React
         ]);
     }
 
     /**
-     * DECONNEXION (optionnel pour plus tard)
+     * RÉCUPÉRER L'UTILISATEUR CONNECTÉ
      */
-    public function logout()
+    public function me(Request $request)
     {
+        return response()->json([
+            'user' => $request->user(),
+        ]);
+    }
+
+    /**
+     * DÉCONNEXION
+     */
+    public function logout(Request $request)
+    {
+        // Supprimer le token actuel
+        $request->user()->currentAccessToken()->delete();
+
         return response()->json([
             'message' => 'Déconnexion réussie'
         ]);
