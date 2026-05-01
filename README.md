@@ -58,5 +58,30 @@ luxafro/
 └── README.md
 \`\`\`
 
-### 7. créer un controller
+### créer un controller
 docker compose exec laravel php artisan make:controller nom_du_controller
+
+###  démarrer le docker
+docker-compose up -d
+
+###  Voir les conténeurs en cours 
+docker ps
+
+###  entrer dans un conteneur
+docker exec -it NOM_DU_CONTENEUR sh
+
+### installer des packages
+npm install NOM_DU_PACKAGE
+
+### LANCER L'app
+npm run dev
+
+### démarrer les conteneurs
+docker-compose up -d
+
+### arreter les conteneurs 
+docker-compose down
+
+### mettre  les conteneurs en pause
+docker-compose stop
+docker-compose start
