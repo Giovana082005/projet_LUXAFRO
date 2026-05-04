@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import type { User, AuthResponse } from "../types/User";
 
@@ -8,7 +8,46 @@ function Login() {
   const [message, setMessage] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true); 
   const navigate = useNavigate();
+
+  //Vérifier le token au chargement
+  useEffect(() => {
+    checkExistingAuth();
+  }, []);
+
+  const checkExistingAuth = async () => {
+    const token = localStorage.getItem("auth_token");
+
+    if (!token) {
+      setCheckingAuth(false);
+      return;
+    }
+
+    try {
+      // Appeler /api/me pour vérifier que le token est toujours valide
+      const res = await fetch("http://localhost:8000/api/me", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/json",
+        },
+      });
+
+      if (res.ok) {
+        // Token valide : récupérer l'utilisateur
+        const data = await res.json();
+        setUser(data.user);
+      } else {
+        // Token invalide : nettoyer le localStorage
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("user");
+      }
+    } catch {
+      console.error("Erreur lors de la vérification du token");
+    } finally {
+      setCheckingAuth(false);
+    }
+  };
 
   const handleLogin = async () => {
     setLoading(true);
@@ -30,11 +69,10 @@ function Login() {
         setMessage(data.message || "Erreur login");
         setUser(null);
       } else {
-        // Stocker le token
         localStorage.setItem("auth_token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         setUser(data.user);
-        setMessage(" Connexion réussie !");
+        setMessage("✅ Connexion réussie !");
       }
     } catch {
       setMessage("Erreur serveur");
@@ -57,15 +95,24 @@ function Login() {
     } catch {
       console.error("Erreur lors de la déconnexion");
     } finally {
-      // Nettoyer le localStorage
       localStorage.removeItem("auth_token");
       localStorage.removeItem("user");
       setUser(null);
       setMessage("Déconnexion réussie");
-      // Retourner à l'accueil
       navigate("/");
     }
   };
+
+  //Affichage pendant la vérification
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl text-center">
+          <p className="text-xl">⏳ Chargement...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
@@ -99,7 +146,7 @@ function Login() {
                 disabled={loading}
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-semibold transition disabled:bg-gray-300"
               >
-                {loading ? " Connexion..." : "Se connecter"}
+                {loading ? "⏳ Connexion..." : "Se connecter"}
               </button>
             </div>
 
@@ -113,13 +160,18 @@ function Login() {
                 S'inscrire
               </Link>
             </p>
+            <p className="mt-6 text-center text-gray-600">
+              <Link to="/forgot-password" className="text-blue-500 hover:underline">
+                Mot de passe oublié ?
+              </Link>
+            </p>
           </>
         ) : (
           // Affichage utilisateur connecté + bouton déconnexion
           <div className="text-center space-y-4">
             <div className="bg-green-50 border border-green-300 rounded-lg p-4">
               <h3 className="text-xl font-semibold mb-2">
-                 Vous êtes connecté(e)
+                ✅ Vous êtes connecté(e)
               </h3>
               <p className="text-gray-700">👤 {user.name}</p>
               <p className="text-gray-600 text-sm">📧 {user.email}</p>
