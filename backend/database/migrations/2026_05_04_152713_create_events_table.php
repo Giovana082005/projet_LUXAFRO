@@ -12,9 +12,26 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('events', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+        $table->id();
+
+        $table->string('nom');
+        $table->text('description');
+
+        $table->date('date');
+        $table->time('horaire');
+
+        $table->string('lieu');
+
+        $table->json('categories');
+
+        $table->boolean('pour_enfant')->default(false);
+
+        $table->integer('nombre_participants')->nullable();
+
+        $table->decimal('tarif', 8, 2)->nullable();
+
+        $table->timestamps();
+    });
     }
 
     /**
