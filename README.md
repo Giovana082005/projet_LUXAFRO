@@ -85,3 +85,6 @@ docker-compose down
 ### mettre  les conteneurs en pause
 docker-compose stop
 docker-compose start
+
+### ajouter un fichier de migration
+docker compose exec laravel php artisan make:migration NOM_DU_FICHIER

@@ -16,5 +16,8 @@ Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']
 // Routes protégées : accessibles que pour les utilisateurs connectés
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
+    Route::get('/admin', function () {
+        return response()->json(['message' => 'Bienvenue admin']);
+    });
     Route::post('/logout', [AuthController::class, 'logout']);
 });
