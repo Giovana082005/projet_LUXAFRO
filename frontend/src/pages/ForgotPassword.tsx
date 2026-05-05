@@ -7,16 +7,41 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  //Récupérer le CSRF cookie avant les requêtes POST
+  const getCsrfCookie = async () => {
+    await fetch("http://localhost:8000/sanctum/csrf-cookie", {
+      credentials: "include",
+    });
+  };
+
+  //Récupérer le token XSRF depuis les cookies
+  const getXsrfToken = (): string => {
+    const cookies = document.cookie.split(";");
+    for (const cookie of cookies) {
+      const [name, value] = cookie.trim().split("=");
+      if (name === "XSRF-TOKEN") {
+        return decodeURIComponent(value);
+      }
+    }
+    return "";
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     setMessage("");
 
     try {
+      //Récupérer le CSRF cookie
+      await getCsrfCookie();
+
+      //Faire la requête de demande de reset
       const res = await fetch("http://localhost:8000/api/forgot-password", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getXsrfToken(), 
         },
         body: JSON.stringify({ email }),
       });
@@ -37,8 +62,8 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+   <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md text-white">
         <h2 className="text-3xl font-bold mb-6 text-center">
           Mot de passe oublié
         </h2>
@@ -56,7 +81,7 @@ const ForgotPassword = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-700 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
               />
 
               <button
@@ -64,7 +89,7 @@ const ForgotPassword = () => {
                 disabled={loading}
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-semibold transition disabled:bg-gray-300"
               >
-                {loading ? "⏳ Envoi en cours..." : "Envoyer le lien"}
+                {loading ? "Envoi en cours..." : "Envoyer le lien"}
               </button>
             </div>
 
