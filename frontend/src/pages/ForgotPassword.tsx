@@ -62,8 +62,8 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+   <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md text-white">
         <h2 className="text-3xl font-bold mb-6 text-center">
           Mot de passe oublié
         </h2>
@@ -81,7 +81,7 @@ const ForgotPassword = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-700 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
               />
 
               <button
@@ -89,7 +89,7 @@ const ForgotPassword = () => {
                 disabled={loading}
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-semibold transition disabled:bg-gray-300"
               >
-                {loading ? "⏳ Envoi en cours..." : "Envoyer le lien"}
+                {loading ? "Envoi en cours..." : "Envoyer le lien"}
               </button>
             </div>
 

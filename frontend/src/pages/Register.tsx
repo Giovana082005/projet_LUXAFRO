@@ -55,7 +55,7 @@ function Register() {
         setMessage(data.message || "Erreur inscription");
       } else {
         setSuccess(true);
-        setMessage("✅ Compte créé avec succès !");
+        setMessage("Compte créé avec succès !");
         
         // Rediriger vers login
         setTimeout(() => {
@@ -70,8 +70,8 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md text-white">
         <h2 className="text-3xl font-bold mb-6 text-center">Inscription</h2>
 
         {!success ? (
@@ -83,7 +83,7 @@ function Register() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 disabled={loading}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full p-3 border border-gray-700 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
               />
 
               <input
@@ -92,7 +92,7 @@ function Register() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full p-3 border border-gray-700 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
               />
 
               <input
@@ -101,15 +101,16 @@ function Register() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
-                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full p-3 border border-gray-700 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
               />
 
               <button
                 onClick={handleRegister}
                 disabled={loading}
-                className="w-full bg-green-500 hover:bg-green-600 text-white p-3 rounded-lg font-semibold transition disabled:bg-gray-300"
-              >
-                {loading ? "⏳ Inscription..." : "S'inscrire"}
+                 className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-semibold transition disabled:bg-gray-300"
+          >
+              
+                {loading ? "Inscription..." : "S'inscrire"}
               </button>
             </div>
 
@@ -128,7 +129,7 @@ function Register() {
           <div className="text-center space-y-4">
             <div className="bg-green-50 border border-green-300 rounded-lg p-6">
               <h3 className="text-2xl font-semibold mb-2">
-                ✅ Inscription réussie !
+                 Inscription réussie !
               </h3>
               <p className="text-gray-700">
                 Votre compte a été créé avec succès.
