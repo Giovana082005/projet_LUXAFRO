@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
 export type Event = {
-  id: number;
   nom: string;
   description: string;
   date: string;

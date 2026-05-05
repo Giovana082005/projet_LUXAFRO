@@ -13,6 +13,7 @@ import AdminEvents from "./pages/AdminEvents";
 import Events from "./pages/Events"; 
 import EventDetails from "./pages/EventDetails";
 import EditEvent from "./pages/EditEvent";
+import CreateEvent from "./pages/CreateEvent";
 
 import AdminRoute from "./components/AdminRoute";
 
@@ -41,7 +42,8 @@ function App() {
         <Route path="users" element={<AdminUsers />} />
         <Route path="events" element={<AdminEvents />} />
         <Route path="events/:id" element={<EventDetails />} />
-        <Route path="events/:id/edit" element={<EditEvent />} /> {/* ✅ corrigé */}
+        <Route path="events/:id/edit" element={<EditEvent />} /> 
+        <Route path="events/create" element={<CreateEvent />} />
       </Route>
     </Routes>
   );

@@ -3,7 +3,7 @@ import { getEvents, deleteEvent } from "../services/eventService";
 import { Event } from "../types/Event";
 import EventCard from "../components/EventCard";
 import { useNavigate } from "react-router-dom";
-import EventFilters from "../components/EventFilters"; 
+import EventFilters from "../components/EventFilters";
 
 const AdminEvents = () => {
   const navigate = useNavigate();
@@ -11,12 +11,11 @@ const AdminEvents = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const token = localStorage.getItem("auth_token") || "";
 
-  // états filtres
+  // filtres
   const [search, setSearch] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [onlyChildren, setOnlyChildren] = useState(false);
 
-  // toggle catégorie
   const toggleCategory = (category: string) => {
     if (selectedCategories.includes(category)) {
       setSelectedCategories(selectedCategories.filter((c) => c !== category));
@@ -25,35 +24,29 @@ const AdminEvents = () => {
     }
   };
 
-  // ✅ fetch avec filtres
-  useEffect(() => {
+  // 🔁 fetch avec filtres
+  const fetchEvents = async () => {
     const params: any = {};
 
     if (search) params.search = search;
     if (selectedCategories.length > 0) {
-      params.category = selectedCategories[0]; // version simple
+      params.category = selectedCategories[0];
     }
     if (onlyChildren) params.child = true;
 
-    getEvents(params)
-      .then((res) => setEvents(res.data))
-      .catch((err) => console.error(err));
+    const res = await getEvents(params);
+    setEvents(res.data);
+  };
+
+  useEffect(() => {
+    fetchEvents();
   }, [search, selectedCategories, onlyChildren]);
 
-  // suppression
+  // 🗑 suppression
   const handleDelete = async (id: number) => {
     if (window.confirm("Supprimer cet événement ?")) {
       await deleteEvent(id, token);
-      // recharge avec filtres actifs
-      const params: any = {};
-      if (search) params.search = search;
-      if (selectedCategories.length > 0) {
-        params.category = selectedCategories[0];
-      }
-      if (onlyChildren) params.child = true;
-
-      const res = await getEvents(params);
-      setEvents(res.data);
+      fetchEvents(); // 👈 recharge propre
     }
   };
 
@@ -63,7 +56,20 @@ const AdminEvents = () => {
 
   return (
     <div>
-      <h1>Admin - Gestion des événements</h1>
+      {/* 🔥 HEADER AVEC BOUTON */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h1>Admin - Gestion des événements</h1>
+
+        <button onClick={() => navigate("/admin/events/create")}>
+          + Créer un événement
+        </button>
+      </div>
 
       {/* FILTRES */}
       <EventFilters

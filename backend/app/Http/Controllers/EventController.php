@@ -30,22 +30,19 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'nom' => 'required|string',
-            'description' => 'required|string',
-            'date' => 'required|date',
-            'horaire' => 'required',
-            'lieu' => 'required|string',
-            'categories' => 'array',
-            'categories.*' => 'in:musique,sport,culture,danse,festival',
-            'pour_enfant' => 'boolean',
-            'nombre_participants' => 'nullable|integer',
-            'tarif' => 'nullable|numeric',
-        ]);
+    $event = Event::create([
+        'nom' => $request->nom,
+        'description' => $request->description,
+        'date' => $request->date,
+        'horaire' => $request->horaire,
+        'lieu' => $request->lieu,
+        'tarif' => $request->tarif,
+        'nombre_participants' => $request->nombre_participants,
+        'pour_enfant' => $request->pour_enfant,
+        'categories' => $request->categories,
+    ]);
 
-        $event = Event::create($validated);
-
-        return response()->json($event, 201);
+    return response()->json($event);
     }
 
      public function show($id)
