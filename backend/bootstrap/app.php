@@ -15,11 +15,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
 
     ->withMiddleware(function (Middleware $middleware): void {
+        //Active EnsureFrontendRequestsAreStateful pour les routes API
+        $middleware->statefulApi();
 
-        //  Activation du CORS (OBLIGATOIRE pour React)
+        //Activation du CORS (OBLIGATOIRE pour React)
         $middleware->append(HandleCors::class);
 
-        // Alias du middleware admin
+        //Alias du middleware admin
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);

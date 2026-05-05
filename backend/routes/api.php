@@ -7,7 +7,8 @@ use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\UserController; 
 use App\Http\Controllers\EventController;
 
-// Routes publiques d'authentification
+Route::middleware(['web'])->group(function () {
+    // Routes publiques d'authentification
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -15,14 +16,18 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [PasswordResetController::class, 'forgotPassword']);
 Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
 
-Route::get('/events', [EventController::class, 'index']);
-Route::get('/events/{id}', [EventController::class, 'show']);
+
+});
+
 
 // Routes protégées
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['web', 'auth:sanctum'])->group(function () {
 
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::get('/events', [EventController::class, 'index']);
+    Route::get('/events/{id}', [EventController::class, 'show']);
 
     // ADMIN ONLY
     Route::middleware('admin')->group(function () {
