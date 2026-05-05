@@ -10,6 +10,10 @@ const EventDetails = () => {
   const [event, setEvent] = useState<Event | null>(null);
   const token = localStorage.getItem("auth_token") || "";
 
+  //  récupération user
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const isAdmin = user?.role === "administrateur";
+
   useEffect(() => {
     if (id) {
       getEventById(Number(id)).then((res) => setEvent(res.data));
@@ -57,8 +61,6 @@ const EventDetails = () => {
         {event.tarif ? `${event.tarif} €` : "Gratuit"}
       </p>
 
-      {/* NOUVEAUX CHAMPS */}
-
       <p>
         <strong>Participants max :</strong>{" "}
         {event.nombre_participants || "Non limité"}
@@ -66,7 +68,7 @@ const EventDetails = () => {
 
       <p>
         <strong>Pour enfant :</strong>{" "}
-        {event.pour_enfant ? "Oui 👶" : "Non"}
+        {event.pour_enfant ? "Oui " : "Non"}
       </p>
 
       <p>
@@ -78,25 +80,43 @@ const EventDetails = () => {
 
       <hr />
 
-      {/* BOUTONS ADMIN */}
-      <button onClick={() => navigate(`/admin/events/${event.id}/edit`)}>
-        Modifier
-      </button>
+      {/*  ADMIN */}
+      {isAdmin && (
+        <>
+          <button onClick={() => navigate(`/admin/events/${event.id}/edit`)}>
+            Modifier
+          </button>
 
-      <button onClick={handleDelete} style={{ marginLeft: "10px" }}>
-        Supprimer
-      </button>
+          <button onClick={handleDelete} style={{ marginLeft: "10px" }}>
+            Supprimer
+          </button>
 
-      <button
-        onClick={() => console.log("Ajouter photos")}
-        style={{ marginLeft: "10px" }}
-      >
-        Ajouter photos
-      </button>
+          <button
+            onClick={() => console.log("Ajouter photos")}
+            style={{ marginLeft: "10px" }}
+          >
+            Ajouter photos
+          </button>
+        </>
+      )}
+
+      {/*  UTILISATEUR */}
+      {!isAdmin && (
+        <button onClick={() => console.log("Réserver")}>
+          Réserver
+        </button>
+      )}
 
       <br /><br />
 
-      <button onClick={() => navigate(-1)}>
+      {/*  RETOUR INTELLIGENT */}
+      <button
+        onClick={() =>
+          isAdmin
+            ? navigate("/admin/events")
+            : navigate("/events")
+        }
+      >
         Retour
       </button>
     </div>

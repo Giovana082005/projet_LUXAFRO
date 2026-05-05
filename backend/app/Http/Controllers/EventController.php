@@ -7,9 +7,25 @@ use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Event::all());
+         $query = Event::query();
+
+        // recherche par nom
+        if ($request->filled('search')) {
+            $query->where('nom', 'like', '%' . $request->search . '%');
+        }
+
+        //  filtre catégories (JSON)
+        if ($request->filled('category')) {
+            $query->whereJsonContains('categories', $request->category);
+        }
+
+        // filtre enfant
+        if ($request->filled('child')) {
+            $query->where('pour_enfant', true);
+        }
+        return response()->json($query->get());
     }
 
     public function store(Request $request)

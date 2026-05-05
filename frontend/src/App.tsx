@@ -9,23 +9,26 @@ import ResetPassword from "./pages/ResetPassword";
 import AdminHome from "./pages/AdminHome";
 import AdminUsers from "./pages/AdminUsers";
 import AdminEvents from "./pages/AdminEvents";
+
+import Events from "./pages/Events"; 
 import EventDetails from "./pages/EventDetails";
-import AdminRoute from "./components/AdminRoute";
 import EditEvent from "./pages/EditEvent";
+
+import AdminRoute from "./components/AdminRoute";
 
 function App() {
   return (
     <Routes>
-      {/* routes publiques */}
+      {/* ROUTES PUBLIQUES */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/events" element={<Events />} /> 
+      <Route path="/events/:id" element={<EventDetails />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/events/:id" element={<EventDetails />} />
-      
 
-      {/* routes admin */}
+      {/* ROUTES ADMIN */}
       <Route
         path="/admin"
         element={
@@ -38,7 +41,7 @@ function App() {
         <Route path="users" element={<AdminUsers />} />
         <Route path="events" element={<AdminEvents />} />
         <Route path="events/:id" element={<EventDetails />} />
-        <Route path="/admin/events/:id/edit" element={<EditEvent />} />
+        <Route path="events/:id/edit" element={<EditEvent />} /> {/* ✅ corrigé */}
       </Route>
     </Routes>
   );

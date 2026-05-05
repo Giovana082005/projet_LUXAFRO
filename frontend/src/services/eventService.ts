@@ -3,7 +3,9 @@ import { Event } from "../types/Event";
 
 const API_URL = "http://localhost:8000/api";
 
-export const getEvents = () => axios.get<Event[]>(`${API_URL}/events`);
+export const getEvents = (params?: any) => {
+  return axios.get(`${API_URL}/events`, { params });
+};
 
 export const getEvent = (id: number) =>
   axios.get<Event>(`${API_URL}/events/${id}`);
@@ -33,7 +35,10 @@ export const updateEvent = (
     },
   });
 
+  
+
 // récupérer un événement par ID
 export const getEventById = (id: number) => {
   return axios.get(`${API_URL}/events/${id}`);
 };
+

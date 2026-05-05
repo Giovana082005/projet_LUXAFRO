@@ -25,8 +25,13 @@ const EventCard = ({
     });
   };
 
+  // ✂️ description courte
+  const shortDescription =
+    event.description.length > 50
+      ? event.description.substring(0, 50) + "..."
+      : event.description;
+
   const handleView = () => {
-    // détecte si on est dans l'espace admin
     if (location.pathname.includes("/admin")) {
       navigate(`/admin/events/${event.id}`);
     } else {
@@ -37,11 +42,30 @@ const EventCard = ({
   return (
     <div style={{ border: "1px solid #ccc", padding: "10px", margin: "10px" }}>
       <h3>{event.nom}</h3>
-      <p>{event.description}</p>
+
+      {/* description courte */}
+      <p>{shortDescription}</p>
 
       <p>
         <strong>Date :</strong> {formatDate(event.date)}
       </p>
+
+      {/* horaire */}
+      <p>
+        <strong>Horaire :</strong> {event.horaire}
+      </p>
+
+      {/* prix */}
+      <p>
+        <strong>Prix :</strong> {event.tarif} €
+      </p>
+
+      {/* catégories */}
+      {event.categories && event.categories.length > 0 && (
+        <p>
+          <strong>Catégories :</strong> {event.categories.join(", ")}
+        </p>
+      )}
 
       <button onClick={handleView}>
         En savoir plus
