@@ -16,11 +16,11 @@ function Home() {
             </span>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-              Grande Fête de Quartier 2026
+            Atelier découverte
             </h1>
             
             <p className="text-gray-400 text-lg leading-relaxed">
-              Notre événement annuel le plus attendu ! Trois jours de festivités avec tournois sportifs, expositions culturelles et délices culinaires. Activités pour toute la famille, concerts en plein air et animations tout au long de la journée.
+              Notre événement annuel réservé aux plus petis...............
             </p>
             
             <div className="space-y-3">
@@ -30,7 +30,7 @@ function Home() {
               </div>
               <div className="flex items-center space-x-2 text-gray-300">
                 <MapPin size={20} className="text-blue-400" />
-                <span>Parc Central</span>
+                <span>Luxembourg, salle ...</span>
               </div>
             </div>
             
@@ -46,7 +46,7 @@ function Home() {
           {/* Image */}
           <div className="rounded-2xl overflow-hidden shadow-2xl">
             <img
-              src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&h=600&fit=crop"
+              src="/images/eventImage.jpg" 
               alt="Événement"
               className="w-full h-full object-cover"
             />

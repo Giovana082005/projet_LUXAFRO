@@ -11,6 +11,8 @@ import AdminUsers from "./pages/AdminUsers";
 import AdminEvents from "./pages/AdminEvents";
 
 import AdminRoute from "./components/AdminRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Events from "./pages/Events";
 
 function App() {
   return (
@@ -23,6 +25,15 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          {/* Routes protégées (utilisateur connecté requis) */}
+        <Route
+          path="/events"
+          element={
+            <ProtectedRoute>
+              <Events />
+            </ProtectedRoute>
+          }
+        />
 
           {/* routes admin */}
           <Route path="/admin" element={<AdminRoute> <AdminHome /></AdminRoute>} >

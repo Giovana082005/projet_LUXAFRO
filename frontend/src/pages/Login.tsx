@@ -103,7 +103,7 @@ function Login() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="bg-white p-8 rounded-2xl shadow-xl text-center">
-          <p className="text-xl">Chargement...</p>
+          <p className="text-xl">...</p>
         </div>
       </div>
     );
