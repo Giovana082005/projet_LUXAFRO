@@ -12,7 +12,6 @@ const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  // Récupérer token et email depuis l'URL
   useEffect(() => {
     const tokenParam = searchParams.get("token");
     const emailParam = searchParams.get("email");
@@ -26,8 +25,26 @@ const ResetPassword = () => {
     setEmail(emailParam);
   }, [searchParams]);
 
+  // Récupérer le CSRF cookie avant les requêtes POST
+  const getCsrfCookie = async () => {
+    await fetch("http://localhost:8000/sanctum/csrf-cookie", {
+      credentials: "include",
+    });
+  };
+
+  // Récupérer le token XSRF depuis les cookies
+  const getXsrfToken = (): string => {
+    const cookies = document.cookie.split(";");
+    for (const cookie of cookies) {
+      const [name, value] = cookie.trim().split("=");
+      if (name === "XSRF-TOKEN") {
+        return decodeURIComponent(value);
+      }
+    }
+    return "";
+  };
+
   const handleSubmit = async () => {
-    // Validation côté client
     if (password.length < 6) {
       setMessage("Le mot de passe doit contenir au moins 6 caractères.");
       return;
@@ -42,11 +59,17 @@ const ResetPassword = () => {
     setMessage("");
 
     try {
-      const res = await fetch("/reset-password", {
+      //Récupérer le CSRF cookie
+      await getCsrfCookie();
+
+      //Faire la requête de reset
+      const res = await fetch("http://localhost:8000/api/reset-password", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getXsrfToken(),
         },
         body: JSON.stringify({
           email,
@@ -63,7 +86,6 @@ const ResetPassword = () => {
       } else {
         setSuccess(true);
         setMessage(data.message);
-        // Rediriger vers login après 3 secondes
         setTimeout(() => {
           navigate("/login");
         }, 3000);

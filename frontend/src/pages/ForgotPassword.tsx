@@ -7,16 +7,41 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  //Récupérer le CSRF cookie avant les requêtes POST
+  const getCsrfCookie = async () => {
+    await fetch("http://localhost:8000/sanctum/csrf-cookie", {
+      credentials: "include",
+    });
+  };
+
+  //Récupérer le token XSRF depuis les cookies
+  const getXsrfToken = (): string => {
+    const cookies = document.cookie.split(";");
+    for (const cookie of cookies) {
+      const [name, value] = cookie.trim().split("=");
+      if (name === "XSRF-TOKEN") {
+        return decodeURIComponent(value);
+      }
+    }
+    return "";
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     setMessage("");
 
     try {
+      //Récupérer le CSRF cookie
+      await getCsrfCookie();
+
+      //Faire la requête de demande de reset
       const res = await fetch("http://localhost:8000/api/forgot-password", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getXsrfToken(), 
         },
         body: JSON.stringify({ email }),
       });

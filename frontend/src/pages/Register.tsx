@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import type { AuthResponse } from "../types/User";
 
 function Register() {
   const [name, setName] = useState("");
@@ -11,32 +10,54 @@ function Register() {
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
+  //Récupérer le CSRF cookie avant les requêtes POST
+  const getCsrfCookie = async () => {
+    await fetch("http://localhost:8000/sanctum/csrf-cookie", {
+      credentials: "include",
+    });
+  };
+
+  //Récupérer le token XSRF depuis les cookies
+  const getXsrfToken = (): string => {
+    const cookies = document.cookie.split(";");
+    for (const cookie of cookies) {
+      const [name, value] = cookie.trim().split("=");
+      if (name === "XSRF-TOKEN") {
+        return decodeURIComponent(value);
+      }
+    }
+    return "";
+  };
+
   const handleRegister = async () => {
     setLoading(true);
     setMessage("");
 
     try {
+      //Récupérer le CSRF cookie
+      await getCsrfCookie();
+
+      //Faire la requête d'inscription
       const res = await fetch("http://localhost:8000/api/register", {
         method: "POST",
+        credentials: "include", // ← IMPORTANT
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json",
+          Accept: "application/json",
+          "X-XSRF-TOKEN": getXsrfToken(),
         },
         body: JSON.stringify({ name, email, password }),
       });
 
-      const data: AuthResponse = await res.json();
+      const data = await res.json();
 
       if (!res.ok) {
         setMessage(data.message || "Erreur inscription");
       } else {
-        // Stocker le token
-        localStorage.setItem("auth_token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
         setSuccess(true);
-        setMessage(" Compte créé avec succès !");
+        setMessage("✅ Compte créé avec succès !");
         
-        // Rediriger vers /login après 2 secondes
+        // Rediriger vers login
         setTimeout(() => {
           navigate("/login");
         }, 2000);
@@ -54,7 +75,6 @@ function Register() {
         <h2 className="text-3xl font-bold mb-6 text-center">Inscription</h2>
 
         {!success ? (
-          // Formulaire d'inscription
           <>
             <div className="space-y-4">
               <input
@@ -89,7 +109,7 @@ function Register() {
                 disabled={loading}
                 className="w-full bg-green-500 hover:bg-green-600 text-white p-3 rounded-lg font-semibold transition disabled:bg-gray-300"
               >
-                {loading ? " Inscription..." : "S'inscrire"}
+                {loading ? "⏳ Inscription..." : "S'inscrire"}
               </button>
             </div>
 
@@ -105,11 +125,10 @@ function Register() {
             </p>
           </>
         ) : (
-          // Message de succès
           <div className="text-center space-y-4">
             <div className="bg-green-50 border border-green-300 rounded-lg p-6">
               <h3 className="text-2xl font-semibold mb-2">
-                 Inscription réussie !
+                ✅ Inscription réussie !
               </h3>
               <p className="text-gray-700">
                 Votre compte a été créé avec succès.
