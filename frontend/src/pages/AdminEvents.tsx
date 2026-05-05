@@ -41,7 +41,7 @@ const AdminEvents = () => {
           isAdmin
           onDelete={handleDelete}
           onEdit={handleEdit}
-          onView={handleView}
+          
         />
       ))}
     </div>

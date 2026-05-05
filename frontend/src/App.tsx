@@ -9,7 +9,7 @@ import ResetPassword from "./pages/ResetPassword";
 import AdminHome from "./pages/AdminHome";
 import AdminUsers from "./pages/AdminUsers";
 import AdminEvents from "./pages/AdminEvents";
-
+import EventDetails from "./pages/EventDetails";
 import AdminRoute from "./components/AdminRoute";
 
 function App() {
@@ -21,6 +21,7 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/events/:id" element={<EventDetails />} />
 
       {/* routes admin */}
       <Route
@@ -34,6 +35,7 @@ function App() {
         <Route index element={<Navigate to="users" />} />
         <Route path="users" element={<AdminUsers />} />
         <Route path="events" element={<AdminEvents />} />
+        <Route path="events/:id" element={<EventDetails />} />
       </Route>
     </Routes>
   );

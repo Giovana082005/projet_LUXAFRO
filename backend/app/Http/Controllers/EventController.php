@@ -31,4 +31,20 @@ class EventController extends Controller
 
         return response()->json($event, 201);
     }
+
+     public function show($id)
+    {
+        // Récupérer l'événement ou erreur 404
+        $event = Event::find($id);
+
+        // Si l'événement n'existe pas
+        if (!$event) {
+            return response()->json([
+                'message' => 'Événement non trouvé'
+            ], 404);
+        }
+
+        // Retourner l'événement
+        return response()->json($event, 200);
+    }
 }

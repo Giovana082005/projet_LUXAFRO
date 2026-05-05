@@ -32,3 +32,8 @@ export const updateEvent = (
       Authorization: `Bearer ${token}`,
     },
   });
+
+// récupérer un événement par ID
+export const getEventById = (id: number) => {
+  return axios.get(`${API_URL}/events/${id}`);
+};

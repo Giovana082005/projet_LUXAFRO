@@ -22,7 +22,7 @@ const Events = () => {
         <EventCard
           key={event.id}
           event={event}
-          onView={handleView}
+          
         />
       ))}
     </div>
