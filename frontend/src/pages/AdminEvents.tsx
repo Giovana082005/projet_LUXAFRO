@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { getEvents, deleteEvent } from "../services/eventService";
 import { Event } from "../types/Event";
 import EventCard from "../components/EventCard";
+import { useNavigate } from "react-router-dom";
 
 const AdminEvents = () => {
+  const navigate = useNavigate();
   const [events, setEvents] = useState<Event[]>([]);
   const token = localStorage.getItem("auth_token") || "";
 
@@ -23,7 +25,7 @@ const AdminEvents = () => {
   };
 
   const handleEdit = (event: Event) => {
-    console.log("Edit:", event);
+    navigate(`/admin/events/${event.id}/edit`);
   };
 
   const handleView = (event: Event) => {

@@ -11,6 +11,7 @@ import AdminUsers from "./pages/AdminUsers";
 import AdminEvents from "./pages/AdminEvents";
 import EventDetails from "./pages/EventDetails";
 import AdminRoute from "./components/AdminRoute";
+import EditEvent from "./pages/EditEvent";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/events/:id" element={<EventDetails />} />
+      
 
       {/* routes admin */}
       <Route
@@ -36,6 +38,7 @@ function App() {
         <Route path="users" element={<AdminUsers />} />
         <Route path="events" element={<AdminEvents />} />
         <Route path="events/:id" element={<EventDetails />} />
+        <Route path="/admin/events/:id/edit" element={<EditEvent />} />
       </Route>
     </Routes>
   );

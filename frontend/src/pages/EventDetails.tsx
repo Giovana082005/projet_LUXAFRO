@@ -22,10 +22,7 @@ const EventDetails = () => {
     if (window.confirm("Supprimer cet événement ?")) {
       try {
         await deleteEvent(event.id, token);
-
-        // redirection après suppression
         navigate("/admin/events");
-
       } catch (error) {
         console.error("Erreur suppression:", error);
       }
@@ -35,28 +32,73 @@ const EventDetails = () => {
   if (!event) return <p>Chargement...</p>;
 
   return (
-    <div>
+    <div style={{ maxWidth: "600px", margin: "auto" }}>
       <h1>{event.nom}</h1>
+
       <p>{event.description}</p>
 
-      <p><strong>Date :</strong> {new Date(event.date).toLocaleDateString("fr-FR")}</p>
-      <p><strong>Lieu :</strong> {event.lieu}</p>
-      <p><strong>Horaire :</strong> {event.horaire}</p>
-      <p><strong>Tarif :</strong> {event.tarif} €</p>
+      <hr />
 
-      {/* bouton supprimer */}
-      <button onClick={handleDelete}>
+      <p>
+        <strong>Date :</strong>{" "}
+        {new Date(event.date).toLocaleDateString("fr-FR")}
+      </p>
+
+      <p>
+        <strong>Horaire :</strong> {event.horaire}
+      </p>
+
+      <p>
+        <strong>Lieu :</strong> {event.lieu}
+      </p>
+
+      <p>
+        <strong>Tarif :</strong>{" "}
+        {event.tarif ? `${event.tarif} €` : "Gratuit"}
+      </p>
+
+      {/* NOUVEAUX CHAMPS */}
+
+      <p>
+        <strong>Participants max :</strong>{" "}
+        {event.nombre_participants || "Non limité"}
+      </p>
+
+      <p>
+        <strong>Pour enfant :</strong>{" "}
+        {event.pour_enfant ? "Oui 👶" : "Non"}
+      </p>
+
+      <p>
+        <strong>Catégories :</strong>{" "}
+        {event.categories && event.categories.length > 0
+          ? event.categories.join(", ")
+          : "Aucune"}
+      </p>
+
+      <hr />
+
+      {/* BOUTONS ADMIN */}
+      <button onClick={() => navigate(`/admin/events/${event.id}/edit`)}>
+        Modifier
+      </button>
+
+      <button onClick={handleDelete} style={{ marginLeft: "10px" }}>
         Supprimer
       </button>
 
-      {/* bouton retour */}
+      <button
+        onClick={() => console.log("Ajouter photos")}
+        style={{ marginLeft: "10px" }}
+      >
+        Ajouter photos
+      </button>
+
+      <br /><br />
+
       <button onClick={() => navigate(-1)}>
         Retour
       </button>
-      {/*ajouter des hotos*/}
-      <button onClick={() => console.log("Ajouter photos")}>
-            Ajouter photos
-          </button>
     </div>
   );
 };

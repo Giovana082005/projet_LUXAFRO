@@ -64,4 +64,25 @@ class EventController extends Controller
         'message' => 'Événement supprimé avec succès'
     ]);
     }
+
+    public function update(Request $request, $id)
+    {
+    $event = Event::findOrFail($id);
+
+    $validated = $request->validate([
+        'nom' => 'required|string',
+        'description' => 'required|string',
+        'date' => 'required|date',
+        'horaire' => 'required',
+        'lieu' => 'required|string',
+        'categories' => 'array',
+        'pour_enfant' => 'boolean',
+        'nombre_participants' => 'nullable|integer',
+        'tarif' => 'nullable|numeric',
+    ]);
+
+    $event->update($validated);
+
+    return response()->json($event);
+    }
 }
