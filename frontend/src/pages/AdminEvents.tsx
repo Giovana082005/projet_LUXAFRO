@@ -5,7 +5,7 @@ import EventCard from "../components/EventCard";
 
 const AdminEvents = () => {
   const [events, setEvents] = useState<Event[]>([]);
-  const token = localStorage.getItem("token") || "";
+  const token = localStorage.getItem("auth_token") || "";
 
   const fetchEvents = () => {
     getEvents().then((res) => setEvents(res.data));
