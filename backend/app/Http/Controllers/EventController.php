@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class EventController extends Controller
 {
@@ -99,7 +100,9 @@ class EventController extends Controller
             'heure_fin' => 'nullable|after:heure_debut',
 
             'lieu' => 'required|string',
-            'categories' => [Rule::in(Event::CATEGORIES)],
+            'categories' => 'array',
+            
+            'categories.*' => Rule::in(Event::CATEGORIES),
             'pour_enfant' => 'boolean',
             'nombre_participants' => 'nullable|integer',
             'tarif' => 'nullable|numeric',
@@ -109,4 +112,29 @@ class EventController extends Controller
 
         return response()->json($event);
     }
+
+    public function addCategories(Request $request, $id)
+{
+    $event = Event::findOrFail($id);
+
+    $validated = $request->validate([
+        'categories' => 'required|array',
+        'categories.*' => 'string'
+    ]);
+
+    // récupérer les catégories existantes (ou tableau vide)
+    $existing = $event->categories ?? [];
+
+    // fusion sans doublons
+    $newCategories = array_unique(array_merge($existing, $validated['categories']));
+
+    // sauvegarde
+    $event->categories = $newCategories;
+    $event->save();
+
+    return response()->json([
+        'message' => 'Catégories ajoutées avec succès',
+        'categories' => $event->categories
+    ]);
+}
 }
