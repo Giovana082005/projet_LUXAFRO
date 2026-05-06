@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import {  Mail, MapPin, Phone } from "lucide-react";
-
+import { FaFacebook, FaInstagram, FaYoutube } from "react-icons/fa";
 function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -67,7 +67,11 @@ function Footer() {
           {/* Colonne 4 : Réseaux sociaux */}
           <div>
             <h3 className="text-white font-semibold mb-4">Suivez-nous</h3>
-            <div className="flex space-x-3"></div>
+            <div className="flex space-x-4">
+              <a href="https://www.facebook.com/luxafroworkshop/" className="hover:text-blue-400 cursor-pointer " > <FaFacebook /></a>
+              <a href="https://www.instagram.com/luxafroworkshop/" className="hover:text-pink-400 cursor-pointer"> <FaInstagram /></a>
+              <a href="https://www.youtube.com/" className="hover:text-red-400 cursor-pointer" > <FaYoutube /></a>
+            </div>
             </div>
         </div>
         {/* Ligne de séparation + copyright */}

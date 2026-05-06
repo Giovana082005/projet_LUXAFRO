@@ -20,7 +20,7 @@ function Home() {
             </h1>
             
             <p className="text-gray-400 text-lg leading-relaxed">
-              Notre événement annuel réservé aux plus petis...............
+              Notre événement annuel réservé aux plus petits...............
             </p>
             
             <div className="space-y-3">
