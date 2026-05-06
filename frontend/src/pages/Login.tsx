@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import type { User } from "../types/User";
+import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -14,26 +15,7 @@ function Login() {
     checkExistingAuth();
   }, []);
 
-  //Récupérer le CSRF cookie avant les requêtes POST
-  const getCsrfCookie = async () => {
-    await fetch("http://localhost:8000/sanctum/csrf-cookie", {
-      credentials: "include",
-    });
-  };
-
-  //Récupérer le token XSRF depuis les cookies
-  const getXsrfToken = (): string => {
-    const cookies = document.cookie.split(";");
-    for (const cookie of cookies) {
-      const [name, value] = cookie.trim().split("=");
-      if (name === "XSRF-TOKEN") {
-        return decodeURIComponent(value);
-      }
-    }
-    return "";
-  };
-
-  //Rediriger selon le rôle
+  // Rediriger selon le rôle
   const redirectByRole = (user: User) => {
     if (user.role === "administrateur") {
       navigate("/admin");
@@ -42,10 +24,10 @@ function Login() {
     }
   };
 
-  //Vérifier si l'utilisateur est déjà connecté (via cookie)
+  // Vérifier si l'utilisateur est déjà connecté (via cookie)
   const checkExistingAuth = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/me", {
+      const res = await fetch(`${API_URL}/api/me`, {
         credentials: "include",
         headers: {
           Accept: "application/json",
@@ -54,7 +36,6 @@ function Login() {
 
       if (res.ok) {
         const data = await res.json();
-        // Rediriger directement selon le rôle
         redirectByRole(data.user);
       }
     } catch {
@@ -69,18 +50,14 @@ function Login() {
     setMessage("");
 
     try {
-      //Récupérer le CSRF cookie
+      // Récupérer le CSRF cookie
       await getCsrfCookie();
 
-      //Faire la requête de login
-      const res = await fetch("http://localhost:8000/api/login", {
+      // Faire la requête de login
+      const res = await fetch(`${API_URL}/api/login`, {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-XSRF-TOKEN": getXsrfToken(),
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ email, password }),
       });
 
@@ -89,7 +66,6 @@ function Login() {
       if (!res.ok) {
         setMessage(data.message || "Erreur login");
       } else {
-        //Rediriger selon le rôle
         redirectByRole(data.user);
       }
     } catch {
