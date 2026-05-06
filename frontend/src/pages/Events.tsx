@@ -1,5 +1,6 @@
 import { Calendar, MapPin, Users, Euro, Baby } from "lucide-react";
 import { useEvents } from "../hooks/useEvents";
+import Spinner from "../components/Spinner";
 
 function Events() {
   const { events, loading, error, refresh } = useEvents();
@@ -22,11 +23,7 @@ function Events() {
 
   // Affichage pendant le chargement
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        <p className="text-xl">...</p>
-      </div>
-    );
+    return <Spinner fullScreen />;
   }
 
   // Affichage en cas d'erreur

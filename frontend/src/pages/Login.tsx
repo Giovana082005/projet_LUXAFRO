@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import type { User } from "../types/User";
 import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
+import Spinner from "../components/Spinner";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,6 +25,7 @@ function Login() {
   };
 
   // Vérifier si l'utilisateur est déjà connecté (via cookie)
+  // Si oui, on le redirige silencieusement pendant qu'il voit le formulaire
   const checkExistingAuth = async () => {
     try {
       const res = await fetch(`${API_URL}/api/me`, {
@@ -39,9 +40,7 @@ function Login() {
         redirectByRole(data.user);
       }
     } catch {
-      console.log("Non connecté");
-    } finally {
-      setCheckingAuth(false);
+      // Non connecté : on laisse simplement le formulaire visible
     }
   };
 
@@ -50,10 +49,8 @@ function Login() {
     setMessage("");
 
     try {
-      // Récupérer le CSRF cookie
       await getCsrfCookie();
 
-      // Faire la requête de login
       const res = await fetch(`${API_URL}/api/login`, {
         method: "POST",
         credentials: "include",
@@ -74,16 +71,6 @@ function Login() {
       setLoading(false);
     }
   };
-
-  if (checkingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-2xl shadow-xl text-center">
-          <p className="text-xl">...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -112,9 +99,16 @@ function Login() {
           <button
             onClick={handleLogin}
             disabled={loading}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-semibold transition disabled:bg-gray-300"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-semibold transition disabled:bg-gray-700"
           >
-            {loading ? "Connexion..." : "Se connecter"}
+            {loading ? (
+              <div className="flex items-center justify-center space-x-2">
+                <Spinner size="sm" color="blue" />
+                <span>Connexion...</span>
+              </div>
+            ) : (
+              "Se connecter"
+            )}
           </button>
         </div>
 

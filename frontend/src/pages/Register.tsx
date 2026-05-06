@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
+import Spinner from "../components/Spinner";
 
 function Register() {
   const [name, setName] = useState("");
@@ -85,10 +86,17 @@ function Register() {
               <button
                 onClick={handleRegister}
                 disabled={loading}
-                 className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-semibold transition disabled:bg-gray-300"
+                 className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-semibold transition disabled:bg-gray-700"
           >
               
-                {loading ? "Inscription..." : "S'inscrire"}
+                {loading ? (
+              <div className="flex items-center justify-center space-x-2">
+                <Spinner size="sm" color="blue" />
+                <span>Inscription...</span>
+              </div>
+            ) : (
+              "S'inscrire"
+            )}
               </button>
             </div>
 

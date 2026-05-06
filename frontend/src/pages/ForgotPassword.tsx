@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
+import Spinner from "../components/Spinner";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -65,9 +66,16 @@ const ForgotPassword = () => {
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-semibold transition disabled:bg-gray-300"
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-semibold transition disabled:bg-gray-700"
               >
-                {loading ? "Envoi en cours..." : "Envoyer le lien"}
+                {loading ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <Spinner size="sm" color="blue" />
+                    <span>Envoi en cours...</span>
+                  </div>
+                ) : (
+                  "Envoyer le lien"
+                )}
               </button>
             </div>
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { API_URL } from "../config/api";
+import Spinner from "./Spinner";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -32,13 +33,9 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
     }
   };
 
-  // Pendant la vérification : afficher un loader
+  // Pendant la vérification : afficher le Spinner
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        <p className="text-xl">...</p>
-      </div>
-    );
+    return <Spinner fullScreen />;
   }
 
   // Si non connecté : rediriger vers /login
