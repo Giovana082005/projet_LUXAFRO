@@ -1,52 +1,8 @@
-import { useState, useEffect } from "react";
-import { Calendar, MapPin, Users, Tag, Euro, Baby } from "lucide-react";
-
-interface Event {
-  id: number;
-  nom: string;
-  description: string;
-  date: string;
-  horaire: string;
-  lieu: string;
-  categories: string[];
-  pour_enfant: boolean;
-  nombre_participants: number | null;
-  tarif: string | null;
-  created_at: string;
-  updated_at: string;
-}
+import { Calendar, MapPin, Users, Euro, Baby } from "lucide-react";
+import { useEvents } from "../hooks/useEvents";
 
 function Events() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  const fetchEvents = async () => {
-    try {
-      const res = await fetch("http://localhost:8000/api/events", {
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error("Erreur lors du chargement des événements");
-      }
-
-      const data = await res.json();
-      setEvents(data);
-    } catch (err) {
-      setError("Impossible de charger les événements");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { events, loading, error, refresh } = useEvents();
 
   // Formater la date en français
   const formatDate = (dateString: string) => {
@@ -80,7 +36,7 @@ function Events() {
         <div className="bg-red-900/30 border border-red-500 rounded-lg p-6 max-w-md text-center">
           <p className="text-red-300 mb-4">❌ {error}</p>
           <button
-            onClick={fetchEvents}
+            onClick={refresh}
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
           >
             Réessayer

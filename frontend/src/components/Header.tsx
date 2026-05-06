@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Menu, X, LogIn, LogOut, User as UserIcon } from "lucide-react";
 import type { User } from "../types/User";
+import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -9,19 +10,19 @@ function Header() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  //Vérifier si l'utilisateur est connecté au chargement
+  // Vérifier si l'utilisateur est connecté au chargement
   useEffect(() => {
     checkAuth();
-  }, [location.pathname]); //Re-vérifie à chaque changement de route
+  }, [location.pathname]); // Re-vérifie à chaque changement de route
 
-  //Fermer le menu mobile quand on change de page
+  // Fermer le menu mobile quand on change de page
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
 
   const checkAuth = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/me", {
+      const res = await fetch(`${API_URL}/api/me`, {
         credentials: "include",
         headers: {
           Accept: "application/json",
@@ -39,33 +40,13 @@ function Header() {
     }
   };
 
-  const getCsrfCookie = async () => {
-    await fetch("http://localhost:8000/sanctum/csrf-cookie", {
-      credentials: "include",
-    });
-  };
-
-  const getXsrfToken = (): string => {
-    const cookies = document.cookie.split(";");
-    for (const cookie of cookies) {
-      const [name, value] = cookie.trim().split("=");
-      if (name === "XSRF-TOKEN") {
-        return decodeURIComponent(value);
-      }
-    }
-    return "";
-  };
-
   const handleLogout = async () => {
     try {
       await getCsrfCookie();
-      await fetch("http://localhost:8000/api/logout", {
+      await fetch(`${API_URL}/api/logout`, {
         method: "POST",
         credentials: "include",
-        headers: {
-          Accept: "application/json",
-          "X-XSRF-TOKEN": getXsrfToken(),
-        },
+        headers: getAuthHeaders(),
       });
     } catch {
       console.error("Erreur lors de la déconnexion");
@@ -75,7 +56,7 @@ function Header() {
     }
   };
 
-  //Liens de navigation
+  // Liens de navigation
   const navLinks = [
     { to: "/", label: "Accueil" },
     { to: "/events", label: "Événements" }
