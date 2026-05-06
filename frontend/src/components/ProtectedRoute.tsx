@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -16,7 +17,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   const checkAuth = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/me", {
+      const res = await fetch(`${API_URL}/api/me`, {
         credentials: "include",
         headers: {
           Accept: "application/json",
