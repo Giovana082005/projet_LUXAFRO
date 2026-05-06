@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -7,42 +8,19 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  //Récupérer le CSRF cookie avant les requêtes POST
-  const getCsrfCookie = async () => {
-    await fetch("http://localhost:8000/sanctum/csrf-cookie", {
-      credentials: "include",
-    });
-  };
-
-  //Récupérer le token XSRF depuis les cookies
-  const getXsrfToken = (): string => {
-    const cookies = document.cookie.split(";");
-    for (const cookie of cookies) {
-      const [name, value] = cookie.trim().split("=");
-      if (name === "XSRF-TOKEN") {
-        return decodeURIComponent(value);
-      }
-    }
-    return "";
-  };
-
   const handleSubmit = async () => {
     setLoading(true);
     setMessage("");
 
     try {
-      //Récupérer le CSRF cookie
+      // Récupérer le CSRF cookie
       await getCsrfCookie();
 
-      //Faire la requête de demande de reset
-      const res = await fetch("http://localhost:8000/api/forgot-password", {
+      // Faire la requête de demande de reset
+      const res = await fetch(`${API_URL}/api/forgot-password`, {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-XSRF-TOKEN": getXsrfToken(), 
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ email }),
       });
 
@@ -62,7 +40,7 @@ const ForgotPassword = () => {
   };
 
   return (
-   <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md text-white">
         <h2 className="text-3xl font-bold mb-6 text-center">
           Mot de passe oublié
