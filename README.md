@@ -91,3 +91,4 @@ docker compose exec laravel php artisan make:migration NOM_DU_FICHIER
 
 ### feeding the databse with seeds
 docker compose exec laravel php artisan db:seed
+php artisan migrate:fresh --seed

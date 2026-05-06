@@ -8,15 +8,16 @@ class Event extends Model
 {
     // Champs autorisés en création
     protected $fillable = [
-        'nom',
-        'description',
-        'date',
-        'horaire',
-        'lieu',
-        'categories',
-        'pour_enfant',
-        'nombre_participants',
-        'tarif',
+    'nom',
+    'description',
+    'date',
+    'heure_debut',
+    'heure_fin',
+    'lieu',
+    'categories',
+    'pour_enfant',
+    'nombre_participants',
+    'tarif',
     ];
 
     // Cast automatique des types
@@ -24,7 +25,8 @@ class Event extends Model
         'categories' => 'array',
         'pour_enfant' => 'boolean',
         'date' => 'date',
-        'horaire' => 'datetime:H:i',
+        'heure_debut' => 'datetime:H:i',
+        'heure_fin' => 'datetime:H:i',
         'tarif' => 'decimal:2',
     ];
 

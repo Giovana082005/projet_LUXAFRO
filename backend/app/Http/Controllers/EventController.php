@@ -7,16 +7,17 @@ use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
+    //LISTE + FILTRES
     public function index(Request $request)
     {
-         $query = Event::query();
+        $query = Event::query();
 
         // recherche par nom
         if ($request->filled('search')) {
             $query->where('nom', 'like', '%' . $request->search . '%');
         }
 
-        //  filtre catégories (JSON)
+        // filtre catégories (JSON)
         if ($request->filled('category')) {
             $query->whereJsonContains('categories', $request->category);
         }
@@ -25,77 +26,87 @@ class EventController extends Controller
         if ($request->filled('child')) {
             $query->where('pour_enfant', true);
         }
+
         return response()->json($query->get());
     }
 
+    // CRÉATION
     public function store(Request $request)
     {
-    $event = Event::create([
-        'nom' => $request->nom,
-        'description' => $request->description,
-        'date' => $request->date,
-        'horaire' => $request->horaire,
-        'lieu' => $request->lieu,
-        'tarif' => $request->tarif,
-        'nombre_participants' => $request->nombre_participants,
-        'pour_enfant' => $request->pour_enfant,
-        'categories' => $request->categories,
-    ]);
+        $validated = $request->validate([
+            'nom' => 'required|string',
+            'description' => 'required|string',
+            'date' => 'required|date',
 
-    return response()->json($event);
+            'heure_debut' => 'required',
+            'heure_fin' => 'nullable|after:heure_debut',
+
+            'lieu' => 'required|string',
+            'categories' => 'array',
+            'pour_enfant' => 'boolean',
+            'nombre_participants' => 'nullable|integer',
+            'tarif' => 'nullable|numeric',
+        ]);
+
+        $event = Event::create($validated);
+
+        return response()->json($event, 201);
     }
 
-     public function show($id)
+    //  DÉTAIL
+    public function show($id)
     {
-        // Récupérer l'événement ou erreur 404
         $event = Event::find($id);
 
-        // Si l'événement n'existe pas
         if (!$event) {
             return response()->json([
                 'message' => 'Événement non trouvé'
             ], 404);
         }
 
-        // Retourner l'événement
         return response()->json($event, 200);
     }
 
+    //  SUPPRESSION
     public function destroy($id)
     {
-    $event = Event::find($id);
+        $event = Event::find($id);
 
-    if (!$event) {
+        if (!$event) {
+            return response()->json([
+                'message' => 'Événement non trouvé'
+            ], 404);
+        }
+
+        $event->delete();
+
         return response()->json([
-            'message' => 'Événement non trouvé'
-        ], 404);
+            'message' => 'Événement supprimé avec succès'
+        ]);
     }
 
-    $event->delete();
-
-    return response()->json([
-        'message' => 'Événement supprimé avec succès'
-    ]);
-    }
-
+    // MODIFICATION
     public function update(Request $request, $id)
     {
-    $event = Event::findOrFail($id);
+        $event = Event::findOrFail($id);
 
-    $validated = $request->validate([
-        'nom' => 'required|string',
-        'description' => 'required|string',
-        'date' => 'required|date',
-        'horaire' => 'required',
-        'lieu' => 'required|string',
-        'categories' => 'array',
-        'pour_enfant' => 'boolean',
-        'nombre_participants' => 'nullable|integer',
-        'tarif' => 'nullable|numeric',
-    ]);
+        $validated = $request->validate([
+            'nom' => 'required|string',
+            'description' => 'required|string',
+            'date' => 'required|date',
 
-    $event->update($validated);
+            'heure_debut' => 'required',
+            'heure_fin' => 'nullable|after:heure_debut',
 
-    return response()->json($event);
+            'lieu' => 'required|string',
+            'categories' => 'array',
+            'pour_enfant' => 'boolean',
+            'nombre_participants' => 'nullable|integer',
+            'tarif' => 'nullable|numeric',
+        ]);
+
+        $event->update($validated);
+
+        return response()->json($event);
     }
 }
