@@ -99,7 +99,7 @@ class EventController extends Controller
             'heure_fin' => 'nullable|after:heure_debut',
 
             'lieu' => 'required|string',
-            'categories' => 'array',
+            'categories' => [Rule::in(Event::CATEGORIES)],
             'pour_enfant' => 'boolean',
             'nombre_participants' => 'nullable|integer',
             'tarif' => 'nullable|numeric',

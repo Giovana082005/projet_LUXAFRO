@@ -25,12 +25,12 @@ class Event extends Model
         'categories' => 'array',
         'pour_enfant' => 'boolean',
         'date' => 'date',
-        'heure_debut' => 'datetime:H:i',
-        'heure_fin' => 'datetime:H:i',
+        'heure_debut' => 'string',
+        'heure_fin' => 'string',
         'tarif' => 'decimal:2',
     ];
 
-    // (Optionnel mais recommandé) liste des catégories autorisées
+    //  liste des catégories autorisées
     public const CATEGORIES = [
         'musique',
         'sport',
