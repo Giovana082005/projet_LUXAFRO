@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, LogIn, LogOut, User as UserIcon } from "lucide-react";
+import { Menu, X, LogIn, LogOut, User as UserIcon, Shield } from "lucide-react";
 import type { User } from "../types/User";
 import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
 
@@ -98,6 +98,16 @@ function Header() {
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-3">
+                {/*Lien Admin (visible uniquement pour les admins) */}
+                {user.role === "administrateur" && (
+                  <Link
+                    to="/admin"
+                    className="flex items-center space-x-2 bg-blue-950 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <Shield size={16} />
+                    <span>Admin</span>
+                  </Link>
+                )}
                 <div className="flex items-center space-x-2 text-gray-300">
                   <UserIcon size={18} />
                   <span className="text-sm">{user.name}</span>
@@ -152,6 +162,16 @@ function Header() {
               <div className="border-t border-gray-800 pt-3 mt-3">
                 {user ? (
                   <div className="space-y-2">
+                    {/* Lien Admin mobile */}
+                    {user.role === "administrateur" && (
+                      <Link
+                        to="/admin"
+                        className="flex items-center space-x-2 bg-blue-950 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors mb-2"
+                      >
+                        <Shield size={16} />
+                        <span>Espace Admin</span>
+                      </Link>
+                    )}
                     <div className="flex items-center space-x-2 text-gray-300 px-3 py-2">
                       <UserIcon size={18} />
                       <span className="text-sm">{user.name}</span>
