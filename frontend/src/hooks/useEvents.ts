@@ -6,10 +6,13 @@ export function useEvents() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  //état : true si l'API a renvoyé une erreur 401 (pas connecté)
+  const [requiresAuth, setRequiresAuth] = useState(false);
 
   const fetchEvents = async () => {
     setLoading(true);
     setError("");
+    setRequiresAuth(false); //Réinitialiser à chaque appel
 
     try {
       const res = await fetch(`${API_URL}/api/events`, {
@@ -19,6 +22,13 @@ export function useEvents() {
         },
       });
 
+      //Cas spécifique : utilisateur non authentifié
+      if (res.status === 401) {
+        setRequiresAuth(true);
+        return;
+      }
+
+      // Autres erreurs HTTP (500, 404, etc.)
       if (!res.ok) {
         throw new Error("Erreur lors du chargement des événements");
       }
@@ -37,6 +47,5 @@ export function useEvents() {
     fetchEvents();
   }, []);
 
-  // On expose les données + une fonction pour rafraîchir
-  return { events, loading, error, refresh: fetchEvents };
+  return { events, loading, error, requiresAuth, refresh: fetchEvents };
 }

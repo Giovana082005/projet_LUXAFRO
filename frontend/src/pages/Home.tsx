@@ -1,70 +1,148 @@
 import { Link } from "react-router-dom";
-import { Calendar, MapPin, ArrowRight } from "lucide-react";
+import { Calendar, MapPin, ArrowRight, LogIn, Lock } from "lucide-react";
+import { useEvents } from "../hooks/useEvents";
+import EventCard from "../components/EventCard";
+import Spinner from "../components/Spinner";
+import HomeHero from "../components/HomeHero";
 
 function Home() {
-  return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          
-          {/* Texte */}
-          <div className="space-y-6">
-            <span className="inline-block bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-semibold">
-              Événement à ne pas manquer
-            </span>
-            
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-            Atelier découverte
-            </h1>
-            
-            <p className="text-gray-400 text-lg leading-relaxed">
-              Notre événement annuel réservé aux plus petits...............
-            </p>
-            
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2 text-gray-300">
-                <Calendar size={20} className="text-blue-400" />
-                <span>1er Juillet 2026</span>
-              </div>
-              <div className="flex items-center space-x-2 text-gray-300">
-                <MapPin size={20} className="text-blue-400" />
-                <span>Luxembourg, salle ...</span>
-              </div>
-            </div>
-            
-            <Link
-              to="/register"
-              className="inline-flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-            >
-              <span>S'inscrire maintenant</span>
-              <ArrowRight size={20} />
-            </Link>
-          </div>
-          
-          {/* Image */}
-          <div className="rounded-2xl overflow-hidden shadow-2xl">
-            <img
-              src="/images/eventImage.jpg" 
-              alt="Événement"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        </div>
-      </section>
+  //Récupération des événements + état d'authentification
+  const { events, loading, error, requiresAuth } = useEvents();
 
-      {/* Section À propos */}
-      <section className="bg-gray-900 py-16">
+  //Filtrer et trier pour ne garder que les 3 prochains événements
+  const upcomingEvents = events
+    .filter((event) => new Date(event.date) >= new Date())
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .slice(0, 3);
+
+  return (
+    <div className="min-h-screen bg-white">
+      
+      {/* SECTION HERO */}
+      <HomeHero />
+
+      {/*  SECTION À PROPOS  */}
+      
+      <section className="bg-blue-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            À propos de l'Association
+          
+          <span className="inline-block bg-blue-950 text-white px-4 py-1.5 rounded-full text-xs font-semibold mb-4 uppercase tracking-wide">
+            Notre association
+          </span>
+          
+          <h2 className="text-3xl md:text-4xl mb-6 font-light text-blue-950">
+            À propos de Luxafro
           </h2>
-          <p className="text-gray-400 text-lg max-w-3xl mx-auto leading-relaxed">
+          
+          <p className="text-blue-900 text-lg max-w-3xl mx-auto leading-relaxed">
             Luxafro est une plateforme dédiée à la valorisation de la culture camerounaise. 
             Nous organisons des événements, partageons des recettes traditionnelles et créons 
             des liens entre les membres de notre communauté.
           </p>
+        </div>
+      </section>
+
+      {/*SECTION  PROCHAINS ÉVÉNEMENTS */}
+      <section className="bg-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* En-tête de la section */}
+          <div className="text-center mb-12">
+            <span className="inline-block bg-blue-950 text-white px-4 py-1.5 rounded-full text-xs font-semibold mb-4 uppercase tracking-wide">
+              Agenda
+            </span>
+            <h2 className="text-3xl md:text-4xl mb-4 font-light text-gray-900">
+              Prochains événements
+            </h2>
+            <p className="text-gray-600 text-lg">
+              Ne manquez pas nos évènements à venir
+            </p>
+          </div>
+          {/* Chargement */}
+          {loading && (
+            <div className="flex justify-center py-12">
+              <Spinner />
+            </div>
+          )}
+
+          {/* Erreur réseau / serveur */}
+          {error && !loading && (
+            <div className="text-center py-12">
+              <p className="text-red-600">❌ {error}</p>
+            </div>
+          )}
+
+          {/*Authentification requise */}
+          {requiresAuth && !loading && (
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-10 text-center max-w-2xl mx-auto">
+              {/* Icône cadenas en cercle */}
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-950 rounded-full mb-4">
+                <Lock size={28} className="text-white" />
+              </div>
+              
+              <h3 className="text-2xl font-semibold text-blue-950 mb-3">
+                Connectez-vous pour découvrir nos événements
+              </h3>
+              
+              <p className="text-blue-900 mb-6 leading-relaxed">
+                Rejoignez la communauté Luxafro pour accéder à tous nos événements 
+                culturels et participer à la valorisation de la culture camerounaise.
+              </p>
+              
+              {/* Boutons Connexion + Inscription */}
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link
+                  to="/login"
+                  className="inline-flex items-center justify-center space-x-2 bg-blue-950 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-md"
+                >
+                  <LogIn size={20} />
+                  <span>Se connecter</span>
+                </Link>
+                
+                <Link
+                  to="/register"
+                  className="inline-flex items-center justify-center space-x-2 bg-white hover:bg-blue-50 text-blue-950 border-2 border-blue-950 px-6 py-3 rounded-lg font-semibold transition-colors"
+                >
+                  <span>Créer un compte</span>
+                  <ArrowRight size={20} />
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/*Aucun événement à venir */}
+          {!loading && !error && !requiresAuth && upcomingEvents.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-700 text-lg">
+                Aucun événement prévu pour le moment.
+              </p>
+              <p className="text-gray-500 mt-2">
+                Revenez bientôt pour découvrir nos prochains événements !
+              </p>
+            </div>
+          )}
+
+          {/* Affichage des événements */}
+          {!loading && !error && !requiresAuth && upcomingEvents.length > 0 && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                {upcomingEvents.map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+
+              {/*Bouton "Voir tous les événements" */}
+              <div className="text-center">
+                <Link
+                  to="/events"
+                  className="inline-flex items-center space-x-2 bg-blue-950 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg"
+                >
+                  <span>Voir tous les événements</span>
+                  <ArrowRight size={20} />
+                </Link>
+              </div>
+            </>
+          )}
         </div>
       </section>
     </div>
