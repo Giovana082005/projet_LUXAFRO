@@ -1,45 +1,24 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Menu, X, LogIn, LogOut, User as UserIcon, Shield } from "lucide-react";
-import type { User } from "../types/User";
 import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
+import { useAuth } from "../hooks/useAuth"; // 🆕 Source unique de vérité
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Vérifier si l'utilisateur est connecté au chargement
-  useEffect(() => {
-    checkAuth();
-  }, [location.pathname]); // Re-vérifie à chaque changement de route
+  //Utilisation du hook centralisé 
+  // 'refresh' permet de re-vérifier l'auth après login/logout
+  const { user, refresh } = useAuth();
 
-  // Fermer le menu mobile quand on change de page
+  //Fermer le menu mobile quand on change de page
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
 
-  const checkAuth = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/me`, {
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-        },
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-      } else {
-        setUser(null);
-      }
-    } catch {
-      setUser(null);
-    }
-  };
-
+  //Déconnexion - utilise refresh() pour synchroniser tous les composants
   const handleLogout = async () => {
     try {
       await getCsrfCookie();
@@ -51,12 +30,14 @@ function Header() {
     } catch {
       console.error("Erreur lors de la déconnexion");
     } finally {
-      setUser(null);
+      //on rafraîchit l'état d'auth GLOBAL
+      //tous les composants utilisant useAuth() vont se mettre à jour
+      await refresh();
       navigate("/");
     }
   };
 
-  // Liens de navigation
+  //Liens de navigation
   const navLinks = [
     { to: "/", label: "Accueil" },
     { to: "/events", label: "Événements" }
@@ -67,7 +48,7 @@ function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           
-          {/* Logo */}
+          {/*Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">Lx</span>
@@ -77,7 +58,7 @@ function Header() {
             </span>
           </Link>
 
-          {/* Navigation desktop (cachée sur mobile) */}
+          {/* Navigation desktop */}
           <nav className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link
@@ -98,6 +79,7 @@ function Header() {
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-3">
+                
                 {/*Lien Admin (visible uniquement pour les admins) */}
                 {user.role === "administrateur" && (
                   <Link
@@ -108,10 +90,12 @@ function Header() {
                     <span>Admin</span>
                   </Link>
                 )}
+
                 <div className="flex items-center space-x-2 text-gray-300">
                   <UserIcon size={18} />
                   <span className="text-sm">{user.name}</span>
                 </div>
+                
                 <button
                   onClick={handleLogout}
                   className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -141,7 +125,7 @@ function Header() {
           </button>
         </div>
 
-        {/* Menu mobile (s'ouvre quand burger cliqué) */}
+        {/*  Menu mobile */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-800">
             <nav className="flex flex-col space-y-3">
@@ -162,20 +146,23 @@ function Header() {
               <div className="border-t border-gray-800 pt-3 mt-3">
                 {user ? (
                   <div className="space-y-2">
-                    {/* Lien Admin mobile */}
+                    
+                    {/*Lien Admin mobile */}
                     {user.role === "administrateur" && (
                       <Link
                         to="/admin"
-                        className="flex items-center space-x-2 bg-blue-950 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors mb-2"
+                        className="flex items-center space-x-2 bg-blue-950 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
                       >
                         <Shield size={16} />
                         <span>Espace Admin</span>
                       </Link>
                     )}
+
                     <div className="flex items-center space-x-2 text-gray-300 px-3 py-2">
                       <UserIcon size={18} />
                       <span className="text-sm">{user.name}</span>
                     </div>
+                    
                     <button
                       onClick={handleLogout}
                       className="w-full flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
