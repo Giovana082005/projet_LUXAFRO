@@ -10,6 +10,10 @@ import AdminHome from "./pages/AdminHome";
 import AdminUsers from "./pages/AdminUsers";
 import AdminEvents from "./pages/AdminEvents";
 
+import EventDetails from "./pages/EventDetails";
+import EditEvent from "./pages/EditEvent";
+import CreateEvent from "./pages/CreateEvent";
+
 import AdminRoute from "./components/AdminRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Events from "./pages/Events";

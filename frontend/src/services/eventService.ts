@@ -1,14 +1,16 @@
 import axios from "axios";
-import { Event } from "../types/Event";
+import { Event, CreateEvent } from "../types/Event";
 
 const API_URL = "http://localhost:8000/api";
 
-export const getEvents = () => axios.get<Event[]>(`${API_URL}/events`);
+export const getEvents = (params?: any) => {
+  return axios.get(`${API_URL}/events`, { params });
+};
 
 export const getEvent = (id: number) =>
   axios.get<Event>(`${API_URL}/events/${id}`);
 
-export const createEvent = (data: Partial<Event>, token: string) =>
+export const createEvent = (data: CreateEvent, token: string) =>
   axios.post(`${API_URL}/events`, data, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -32,3 +34,8 @@ export const updateEvent = (
       Authorization: `Bearer ${token}`,
     },
   });
+
+// récupérer un événement par ID
+export const getEventById = (id: number) => {
+  return axios.get(`${API_URL}/events/${id}`);
+};

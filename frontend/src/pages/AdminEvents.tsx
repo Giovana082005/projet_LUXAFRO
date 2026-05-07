@@ -2,48 +2,106 @@ import { useEffect, useState } from "react";
 import { getEvents, deleteEvent } from "../services/eventService";
 import { Event } from "../types/Event";
 import EventCard from "../components/EventCard";
+import { useNavigate } from "react-router-dom";
+import EventFilters from "../components/EventFilters";
 
 const AdminEvents = () => {
-  const [events, setEvents] = useState<Event[]>([]);
-  const token = localStorage.getItem("token") || "";
+  const navigate = useNavigate();
 
-  const fetchEvents = () => {
-    getEvents().then((res) => setEvents(res.data));
+  const [events, setEvents] = useState<Event[]>([]);
+  const token = localStorage.getItem("auth_token") || "";
+
+  // filtres
+  const [search, setSearch] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [onlyChildren, setOnlyChildren] = useState(false);
+
+  const toggleCategory = (category: string) => {
+    if (selectedCategories.includes(category)) {
+      setSelectedCategories(selectedCategories.filter((c) => c !== category));
+    } else {
+      setSelectedCategories([...selectedCategories, category]);
+    }
+  };
+
+  // 🔁 fetch avec filtres
+  const fetchEvents = async () => {
+    const params: any = {};
+
+    if (search) params.search = search;
+    if (selectedCategories.length > 0) {
+      params.category = selectedCategories[0];
+    }
+    if (onlyChildren) params.child = true;
+
+    const res = await getEvents(params);
+    setEvents(res.data);
   };
 
   useEffect(() => {
     fetchEvents();
-  }, []);
+  }, [search, selectedCategories, onlyChildren]);
 
+  // 🗑 suppression
   const handleDelete = async (id: number) => {
     if (window.confirm("Supprimer cet événement ?")) {
       await deleteEvent(id, token);
-      fetchEvents();
+      fetchEvents(); // 👈 recharge propre
     }
   };
 
   const handleEdit = (event: Event) => {
-    console.log("Edit:", event);
-  };
-
-  const handleView = (event: Event) => {
-    console.log("View:", event);
+    navigate(`/admin/events/${event.id}/edit`);
   };
 
   return (
     <div>
-      <h1>Admin - Gestion des événements</h1>
+      {/* 🔥 HEADER AVEC BOUTON */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h1>Admin - Gestion des événements</h1>
 
-      {events.map((event) => (
-        <EventCard
-          key={event.id}
-          event={event}
-          isAdmin
-          onDelete={handleDelete}
-          onEdit={handleEdit}
-          onView={handleView}
-        />
-      ))}
+        <button onClick={() => navigate("/admin/events/create")}>
+          + Créer un événement
+        </button>
+      </div>
+
+      {/* FILTRES */}
+      <EventFilters
+        search={search}
+        setSearch={setSearch}
+        selectedCategories={selectedCategories}
+        toggleCategory={toggleCategory}
+        onlyChildren={onlyChildren}
+        setOnlyChildren={setOnlyChildren}
+        onReset={() => {
+          setSearch("");
+          setSelectedCategories([]);
+          setOnlyChildren(false);
+        }}
+      />
+
+      <hr />
+
+      {/* LISTE */}
+      {events.length === 0 ? (
+        <p>Aucun événement trouvé</p>
+      ) : (
+        events.map((event) => (
+          <EventCard
+            key={event.id}
+            event={event}
+            isAdmin
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+          />
+        ))
+      )}
     </div>
   );
 };
