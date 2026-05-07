@@ -53,7 +53,7 @@ function HomeHero() {
         </div>
         
         {/*Indicateur scroll*/}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center text-white/60 animate-bounce">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center text-pink-800/60 animate-bounce">
           <span className="text-xs uppercase tracking-wider mb-2">Découvrir</span>
           <div className="w-6 h-10 border-2 border-white/40 rounded-full flex items-start justify-center p-1.5">
             <div className="w-1 h-2 bg-white/60 rounded-full"></div>

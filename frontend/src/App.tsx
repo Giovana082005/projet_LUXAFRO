@@ -1,35 +1,40 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+
+//Layouts
 import Layout from "./components/Layout";
+import AdminLayout from "./components/admin/AdminLayout";
+
+//Protections de routes
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
+
+//Pages publiques
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-
-import AdminHome from "./pages/AdminHome";
-import AdminUsers from "./pages/AdminUsers";
-import AdminEvents from "./pages/AdminEvents";
-
-import EventDetails from "./pages/EventDetails";
-import EditEvent from "./pages/EditEvent";
-import CreateEvent from "./pages/CreateEvent";
-
-import AdminRoute from "./components/AdminRoute";
-import ProtectedRoute from "./components/ProtectedRoute";
 import Events from "./pages/Events";
+
+//Pages admin
+import Dashboard from "./pages/admin/Dashboard";
+import UsersManagement from "./pages/admin/UsersManagement";
 
 function App() {
   return (
     <Routes>
-       {/* Routes avec Layout (header + footer) */}
+      
+      {/* Routes avec Layout principal (Header + Footer) */}
       <Route element={<Layout />}>
-          {/* routes publiques */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          {/* Routes protégées (utilisateur connecté requis) */}
+        
+        {/* Routes publiques */}
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        
+        {/* Routes protégées (utilisateur connecté requis) */}
         <Route
           path="/events"
           element={
@@ -38,13 +43,23 @@ function App() {
             </ProtectedRoute>
           }
         />
+      </Route>
 
-          {/* routes admin */}
-          <Route path="/admin" element={<AdminRoute> <AdminHome /></AdminRoute>} >
-            <Route index element={<Navigate to="users" />} />
-            <Route path="users" element={<AdminUsers />} />
-            <Route path="events" element={<AdminEvents />} />
-          </Route>
+      {/* Routes ADMIN (avec AdminLayout dédié) */}
+      <Route 
+        path="/admin" 
+        element={
+          <AdminProtectedRoute>
+            <AdminLayout />
+          </AdminProtectedRoute>
+        }
+      >
+        {/* /admin  Dashboard */}
+        <Route index element={<Dashboard />} />
+        
+        {/* /admin/users : Gestion utilisateurs */}
+        <Route path="users" element={<UsersManagement />} />
+        
       </Route>
       
     </Routes>

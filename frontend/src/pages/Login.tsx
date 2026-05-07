@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import type { User } from "../types/User";
 import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
 import Spinner from "../components/Spinner";
+import { useAuth } from "../hooks/useAuth"; 
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -11,11 +12,17 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    checkExistingAuth();
-  }, []);
+  //Utilisation du Context d'auth
+  const { user, loading: authLoading, refresh } = useAuth();
 
-  // Rediriger selon le rôle
+  //Redirection automatique si déjà connecté
+  useEffect(() => {
+    if (!authLoading && user) {
+      redirectByRole(user);
+    }
+  }, [user, authLoading]);
+
+  //Rediriger selon le rôle
   const redirectByRole = (user: User) => {
     if (user.role === "administrateur") {
       navigate("/admin");
@@ -24,26 +31,7 @@ function Login() {
     }
   };
 
-  // Vérifier si l'utilisateur est déjà connecté (via cookie)
-  // Si oui, on le redirige silencieusement pendant qu'il voit le formulaire
-  const checkExistingAuth = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/me`, {
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-        },
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        redirectByRole(data.user);
-      }
-    } catch {
-      // Non connecté : on laisse simplement le formulaire visible
-    }
-  };
-
+  //Login
   const handleLogin = async () => {
     setLoading(true);
     setMessage("");
@@ -63,6 +51,8 @@ function Login() {
       if (!res.ok) {
         setMessage(data.message || "Erreur login");
       } else {
+        //Rafraîchir le Context AVANT de naviguer
+        await refresh();
         redirectByRole(data.user);
       }
     } catch {

@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
 import type { Event } from "../types/Event";
 import { API_URL } from "../config/api";
+import { useAuth } from "./useAuth";
 
 export function useEvents() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  //état : true si l'API a renvoyé une erreur 401 (pas connecté)
   const [requiresAuth, setRequiresAuth] = useState(false);
+
+  //On récupère l'utilisateur connecté pour réagir aux changements
+  const { user, loading: authLoading } = useAuth();
 
   const fetchEvents = async () => {
     setLoading(true);
     setError("");
-    setRequiresAuth(false); //Réinitialiser à chaque appel
+    setRequiresAuth(false);
 
     try {
       const res = await fetch(`${API_URL}/api/events`, {
@@ -22,13 +25,12 @@ export function useEvents() {
         },
       });
 
-      //Cas spécifique : utilisateur non authentifié
       if (res.status === 401) {
         setRequiresAuth(true);
+        setEvents([]); //vider la liste si pas autorisé
         return;
       }
 
-      // Autres erreurs HTTP (500, 404, etc.)
       if (!res.ok) {
         throw new Error("Erreur lors du chargement des événements");
       }
@@ -37,15 +39,20 @@ export function useEvents() {
       setEvents(data);
     } catch (err) {
       setError("Impossible de charger les événements");
+      setEvents([]); //Vider la liste en cas d'erreur
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
+  //Re-fetch à chaque changement d'utilisateur (login/logout)
   useEffect(() => {
-    fetchEvents();
-  }, []);
+    //On attend que useAuth ait fini de vérifier
+    if (!authLoading) {
+      fetchEvents();
+    }
+  }, [user?.id, authLoading]);
 
   return { events, loading, error, requiresAuth, refresh: fetchEvents };
 }
