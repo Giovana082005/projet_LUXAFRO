@@ -25,6 +25,9 @@ Route::middleware(['web'])->group(function () {
     // EVENTS (PUBLIC)
     Route::get('/events', [EventController::class, 'index']);
     Route::get('/events/{id}', [EventController::class, 'show']);
+
+    //RESERVATIONS 
+    Route::post('/reservations', [ReservationController::class, 'store']);
 });
 
 
