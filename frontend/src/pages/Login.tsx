@@ -1,37 +1,26 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import type { User } from "../types/User";
+import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
+import Spinner from "../components/Spinner";
+import { useAuth } from "../hooks/useAuth"; 
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(true);
   const navigate = useNavigate();
 
+  //Utilisation du Context d'auth
+  const { user, loading: authLoading, refresh } = useAuth();
+
+  //Redirection automatique si déjà connecté
   useEffect(() => {
-    checkExistingAuth();
-  }, []);
-
-  //Récupérer le CSRF cookie avant les requêtes POST
-  const getCsrfCookie = async () => {
-    await fetch("http://localhost:8000/sanctum/csrf-cookie", {
-      credentials: "include",
-    });
-  };
-
-  //Récupérer le token XSRF depuis les cookies
-  const getXsrfToken = (): string => {
-    const cookies = document.cookie.split(";");
-    for (const cookie of cookies) {
-      const [name, value] = cookie.trim().split("=");
-      if (name === "XSRF-TOKEN") {
-        return decodeURIComponent(value);
-      }
+    if (!authLoading && user) {
+      redirectByRole(user);
     }
-    return "";
-  };
+  }, [user, authLoading]);
 
   //Rediriger selon le rôle
   const redirectByRole = (user: User) => {
@@ -42,45 +31,18 @@ function Login() {
     }
   };
 
-  //Vérifier si l'utilisateur est déjà connecté (via cookie)
-  const checkExistingAuth = async () => {
-    try {
-      const res = await fetch("http://localhost:8000/api/me", {
-        credentials: "include",
-        headers: {
-          Accept: "application/json",
-        },
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        // Rediriger directement selon le rôle
-        redirectByRole(data.user);
-      }
-    } catch {
-      console.log("Non connecté");
-    } finally {
-      setCheckingAuth(false);
-    }
-  };
-
+  //Login
   const handleLogin = async () => {
     setLoading(true);
     setMessage("");
 
     try {
-      //Récupérer le CSRF cookie
       await getCsrfCookie();
 
-      //Faire la requête de login
-      const res = await fetch("http://localhost:8000/api/login", {
+      const res = await fetch(`${API_URL}/api/login`, {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "X-XSRF-TOKEN": getXsrfToken(),
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ email, password }),
       });
 
@@ -89,7 +51,8 @@ function Login() {
       if (!res.ok) {
         setMessage(data.message || "Erreur login");
       } else {
-        //Rediriger selon le rôle
+        //Rafraîchir le Context AVANT de naviguer
+        await refresh();
         redirectByRole(data.user);
       }
     } catch {
@@ -98,16 +61,6 @@ function Login() {
       setLoading(false);
     }
   };
-
-  if (checkingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-2xl shadow-xl text-center">
-          <p className="text-xl">...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -136,9 +89,16 @@ function Login() {
           <button
             onClick={handleLogin}
             disabled={loading}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-semibold transition disabled:bg-gray-300"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-semibold transition disabled:bg-gray-700"
           >
-            {loading ? "Connexion..." : "Se connecter"}
+            {loading ? (
+              <div className="flex items-center justify-center space-x-2">
+                <Spinner size="sm" color="blue" />
+                <span>Connexion...</span>
+              </div>
+            ) : (
+              "Se connecter"
+            )}
           </button>
         </div>
 

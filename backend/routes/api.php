@@ -37,14 +37,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // ADMIN ONLY
     Route::middleware('admin')->group(function () {
+       //CRUD Utilisateurs (admin)
+        Route::get('/users', [UserController::class, 'index']);          
+        Route::get('/users/{id}', [UserController::class, 'show']);      
+        Route::put('/users/{id}', [UserController::class, 'update']);    
+        Route::delete('/users/{id}', [UserController::class, 'destroy']); 
 
-        Route::get('/users', [UserController::class, 'index']);
-
+        //CRUD Événements (admin)
         Route::post('/events', [EventController::class, 'store']);
         Route::put('/events/{id}', [EventController::class, 'update']);
         Route::delete('/events/{id}', [EventController::class, 'destroy']);
         Route::post('/events/{id}/categories', [EventController::class, 'addCategories']);
 
+        //Dashboard admin (route de test)
         Route::get('/admin', function () {
             return response()->json(['message' => 'Bienvenue admin']);
         });

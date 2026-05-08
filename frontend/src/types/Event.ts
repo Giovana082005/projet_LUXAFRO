@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
-
 export type Event = {
+  id: number;
   nom: string;
   description: string;
   date: string;
@@ -8,32 +7,8 @@ export type Event = {
   lieu: string;
   categories: string[];
   pour_enfant: boolean;
-  nombre_participants: number;
-  tarif: number;
+  nombre_participants: number | null;
+  tarif: string | null;
+  created_at: string;
+  updated_at: string;
 };
-
-export function useEvents() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchEvents = async () => {
-    setLoading(true);
-
-    try {
-      const res = await fetch("http://localhost:8000/api/events");
-
-      const data = await res.json();
-      setEvents(data);
-    } catch (error) {
-      console.error("Erreur fetch events:", error);
-    }
-
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  return { events, loading, refresh: fetchEvents };
-}

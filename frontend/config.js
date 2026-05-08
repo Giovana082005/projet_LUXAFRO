@@ -1,1 +1,0 @@
-//export const url_base_api = import.meta.env.

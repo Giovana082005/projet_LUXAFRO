@@ -11,5 +11,5 @@ export interface User {
 export interface AuthResponse {
   message: string;
   user: User;
-  token: string; // ← Le token Sanctum
+  token: string;
 }
