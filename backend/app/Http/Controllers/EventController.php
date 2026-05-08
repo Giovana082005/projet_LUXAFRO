@@ -9,26 +9,26 @@ use Illuminate\Validation\Rule;
 class EventController extends Controller
 {
     //LISTE + FILTRES
-    public function index(Request $request)
+   public function index(Request $request)
     {
-        $query = Event::query();
+    $query = Event::with('photos');
 
-        // recherche par nom
-        if ($request->filled('search')) {
-            $query->where('nom', 'like', '%' . $request->search . '%');
-        }
+    // recherche par nom
+    if ($request->filled('search')) {
+        $query->where('nom', 'like', '%' . $request->search . '%');
+    }
 
-        // filtre catégories (JSON)
-        if ($request->filled('category')) {
-            $query->whereJsonContains('categories', $request->category);
-        }
+    // filtre catégories
+    if ($request->filled('category')) {
+        $query->whereJsonContains('categories', $request->category);
+    }
 
-        // filtre enfant
-        if ($request->filled('child')) {
-            $query->where('pour_enfant', true);
-        }
+    // filtre enfant
+    if ($request->filled('child')) {
+        $query->where('pour_enfant', true);
+    }
 
-        return response()->json($query->get());
+    return response()->json($query->get());
     }
 
     // CRÉATION
@@ -57,15 +57,15 @@ class EventController extends Controller
     //  DÉTAIL
     public function show($id)
     {
-        $event = Event::find($id);
+    $event = Event::with('photos')->find($id);
 
-        if (!$event) {
-            return response()->json([
-                'message' => 'Événement non trouvé'
-            ], 404);
-        }
+    if (!$event) {
+        return response()->json([
+            'message' => 'Événement non trouvé'
+        ], 404);
+    }
 
-        return response()->json($event, 200);
+    return response()->json($event, 200);
     }
 
     //  SUPPRESSION
@@ -137,4 +137,5 @@ class EventController extends Controller
         'categories' => $event->categories
     ]);
 }
+
 }

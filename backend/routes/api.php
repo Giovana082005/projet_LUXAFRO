@@ -5,7 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EventController;
-
+use App\Http\Controllers\EventPhotoController;
 /*
 |--------------------------------------------------------------------------
 | ROUTES PUBLIQUES
@@ -53,6 +53,8 @@ Route::middleware(['web', 'auth:sanctum'])->group(function () {
         Route::put('/events/{id}', [EventController::class, 'update']);
         Route::delete('/events/{id}', [EventController::class, 'destroy']);
         Route::post('/events/{id}/categories', [EventController::class, 'addCategories']);
+        Route::post('/events/{id}/photos', [EventPhotoController::class, 'store']);
+        Route::delete('/photos/{id}', [EventPhotoController::class, 'destroy']);
 
         Route::get('/admin', function () {
             return response()->json([

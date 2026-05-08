@@ -38,4 +38,10 @@ class Event extends Model
         'danse',
         'festival',
     ];
+
+    //relation one to many 
+    public function photos()
+    {
+    return $this->hasMany(EventPhoto::class);
+    }
 }
