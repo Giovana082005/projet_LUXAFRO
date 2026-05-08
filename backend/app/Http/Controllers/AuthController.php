@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -26,13 +27,15 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Création du token Sanctum
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // Connecter automatiquement l'utilisateur après inscription
+        Auth::login($user);
+
+        // Régénérer la session pour la sécurité
+        $request->session()->regenerate();
 
         return response()->json([
             'message' => 'Utilisateur créé avec succès',
             'user' => $user,
-            'token' => $token,
         ], 201);
     }
 
@@ -46,26 +49,24 @@ class AuthController extends Controller
             'password' => 'required|string'
         ]);
 
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        //Tenter la connexion via Auth
+        if (!Auth::attempt($request->only('email', 'password'))) {
             throw ValidationException::withMessages([
                 'email' => ['Identifiants incorrects.'],
             ]);
         }
 
-        // Création du token Sanctum
-        $token = $user->createToken('auth_token')->plainTextToken;
+        //Régénérer la session pour la sécurité
+        $request->session()->regenerate();
 
         return response()->json([
             'message' => 'Connexion réussie',
-            'user' => $user,
-            'token' => $token,
+            'user' => Auth::user(),
         ]);
     }
 
     /**
-     * UTILISATEUR CONNECTÉ
+     * RÉCUPÉRER L'UTILISATEUR CONNECTÉ
      */
     public function me(Request $request)
     {
@@ -79,7 +80,14 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        //Déconnecter l'utilisateur
+        Auth::guard('web')->logout();
+
+        //Invalider la session
+        $request->session()->invalidate();
+
+        //Régénérer le token CSRF
+        $request->session()->regenerateToken();
 
         return response()->json([
             'message' => 'Déconnexion réussie'
