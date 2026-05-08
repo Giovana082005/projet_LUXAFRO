@@ -44,4 +44,9 @@ class Event extends Model
     {
     return $this->hasMany(EventPhoto::class);
     }
+
+    public function reservations()
+    {
+    return $this->hasMany(Reservation::class);
+    }
 }

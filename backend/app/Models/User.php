@@ -41,4 +41,11 @@ class User extends Authenticatable
     {
         return $this->role === self::ROLE_ADMIN;
     }
+    /**
+     * relations avec réservations
+     */
+    public function reservations()
+    {
+    return $this->hasMany(Reservation::class);
+    }
 }
