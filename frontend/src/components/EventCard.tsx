@@ -1,6 +1,7 @@
 import { Calendar, MapPin, Users, Euro, Baby, Clock } from "lucide-react";
 import type { Event } from "../types/Event";
 import { getImageUrl } from "../config/api";
+import { Link } from "react-router-dom";
 
 interface EventCardProps {
   event: Event;
@@ -140,9 +141,12 @@ function EventCard({ event }: EventCardProps) {
         </div>
 
         {/*  Bouton CTA */}
-        <button className="mt-auto w-full bg-blue-950 hover:bg-blue-700 text-white py-2.5 rounded-lg font-semibold transition-colors">
-          En savoir plus
-        </button>
+        <Link
+            to={`/events/${event.id}`}
+            className="mt-auto w-full bg-blue-950 hover:bg-blue-700 text-white py-2.5 rounded-lg font-semibold transition-colors text-center"
+          >
+            En savoir plus
+          </Link>
       </div>
     </div>
   );
