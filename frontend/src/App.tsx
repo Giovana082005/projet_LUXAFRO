@@ -15,7 +15,7 @@ import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Events from "./pages/Events";
-import EventDetails from "./pages/EventDetails";
+import EventDetail from "./pages/EventDetail";
 
 //Pages admin
 import Dashboard from "./pages/admin/Dashboard";
@@ -46,11 +46,12 @@ function App() {
           }
         />
       </Route>
+      {/* Détail d'un événement */}
       <Route
         path="/events/:id"
         element={
           <ProtectedRoute>
-            <EventDetails />
+            <EventDetail />
           </ProtectedRoute>
         }
       />
