@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventPhotoController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ReservationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,18 @@ Route::middleware(['web'])->group(function () {
 
     //CATÉGORIES (lecture publique)
     Route::get('/categories', [CategoryController::class, 'index']);
+
+    //RESERVATIONS
+     // créer une réservation
+    Route::post('/reservations', [ReservationController::class, 'store']);
+    // mes réservations
+    Route::get('/my-reservations', [ReservationController::class, 'myReservations']);
+    // détail réservation
+    Route::get('/reservations/{id}', [ReservationController::class,'show']);
+    // annuler réservation
+    Route::put('/reservations/{id}/cancel', [ReservationController::class,'cancel']);
+    // places restantes d’un événement
+    Route::get('/events/{id}/places-restantes', [ReservationController::class,'placesRestantes']);
 });
 
 
