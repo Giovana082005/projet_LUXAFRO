@@ -8,6 +8,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventPhotoController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\ContactController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,85 +16,41 @@ use App\Http\Controllers\ReservationController;
 |--------------------------------------------------------------------------
 */
 
-// CATÉGORIES
-Route::get('/categories', [CategoryController::class, 'index']);
-
-// PLACES RESTANTES
-Route::get('/events/{id}/places-restantes', [ReservationController::class, 'placesRestantes']);
-
-/*
-|--------------------------------------------------------------------------
-| ROUTES AVEC SESSIONS WEB
-|--------------------------------------------------------------------------
-*/
-
 Route::middleware('web')->group(function () {
 
-    /*
-    |--------------------------------------------------------------------------
-    | AUTH
-    |--------------------------------------------------------------------------
-    */
-
     Route::post('/register', [AuthController::class, 'register']);
-
     Route::post('/login', [AuthController::class, 'login']);
 
-    Route::post('/logout', [AuthController::class, 'logout']);
-
-    /*
-    |--------------------------------------------------------------------------
-    | PASSWORD
-    |--------------------------------------------------------------------------
-    */
-
     Route::post('/forgot-password', [PasswordResetController::class, 'forgotPassword']);
-
     Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
+
+    Route::get('/categories', [CategoryController::class, 'index']);
+
+    Route::get('/events/{id}/places-restantes', [ReservationController::class, 'placesRestantes']);
+
+    Route::post('/contact', [ContactController::class, 'store']);
 });
 
 /*
 |--------------------------------------------------------------------------
-| ROUTES PROTÉGÉES
+| ROUTES PROTÉGÉES (SESSIONS)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['web', 'auth:sanctum'])->group(function () {
+Route::middleware(['web', 'auth'])->group(function () {
 
-    /*
-    |--------------------------------------------------------------------------
-    | AUTH
-    |--------------------------------------------------------------------------
-    */
-
+    // AUTH
     Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | EVENTS
-    |--------------------------------------------------------------------------
-    */
-
+    // EVENTS
     Route::get('/events', [EventController::class, 'index']);
-
     Route::get('/events/{id}', [EventController::class, 'show']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | RÉSERVATIONS
-    |--------------------------------------------------------------------------
-    */
-
-    // créer une réservation
+    // RÉSERVATIONS
     Route::post('/reservations', [ReservationController::class, 'store']);
-
-    // mes réservations
     Route::get('/my-reservations', [ReservationController::class, 'myReservations']);
-
-    // détail réservation
     Route::get('/reservations/{id}', [ReservationController::class, 'show']);
-
-    // annuler réservation
     Route::put('/reservations/{id}/cancel', [ReservationController::class, 'cancel']);
 
     /*
@@ -104,62 +61,34 @@ Route::middleware(['web', 'auth:sanctum'])->group(function () {
 
     Route::middleware('admin')->group(function () {
 
-        /*
-        |--------------------------------------------------------------------------
-        | USERS
-        |--------------------------------------------------------------------------
-        */
-
+        // USERS
         Route::get('/users', [UserController::class, 'index']);
-
         Route::get('/users/{id}', [UserController::class, 'show']);
-
         Route::put('/users/{id}', [UserController::class, 'update']);
-
         Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
-        /*
-        |--------------------------------------------------------------------------
-        | EVENTS
-        |--------------------------------------------------------------------------
-        */
-
+        // EVENTS
         Route::post('/events', [EventController::class, 'store']);
-
         Route::put('/events/{id}', [EventController::class, 'update']);
-
         Route::delete('/events/{id}', [EventController::class, 'destroy']);
-
         Route::post('/events/{id}/categories', [EventController::class, 'addCategories']);
 
-        /*
-        |--------------------------------------------------------------------------
-        | CATEGORIES
-        |--------------------------------------------------------------------------
-        */
-
+        // CATEGORIES
         Route::post('/categories', [CategoryController::class, 'store']);
-
         Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
 
-        /*
-        |--------------------------------------------------------------------------
-        | PHOTOS
-        |--------------------------------------------------------------------------
-        */
-
+        // PHOTOS
         Route::post('/events/{id}/photos', [EventPhotoController::class, 'store']);
-
         Route::delete('/photos/{id}', [EventPhotoController::class, 'destroy']);
 
-        /*
-        |--------------------------------------------------------------------------
-        | TEST ADMIN
-        |--------------------------------------------------------------------------
-        */
+        // CONTACTS
+        Route::get('/contacts', [ContactController::class, 'getContacts']);
+        Route::get('/contacts/{id}', [ContactController::class, 'getContactDetails']);
+        Route::put('/contacts/{id}/read', [ContactController::class, 'markAsRead']);
+        Route::delete('/contacts/{id}', [ContactController::class, 'destroy']);
 
+        // TEST ADMIN
         Route::get('/admin', function () {
-
             return response()->json([
                 'message' => 'Bienvenue admin'
             ]);
