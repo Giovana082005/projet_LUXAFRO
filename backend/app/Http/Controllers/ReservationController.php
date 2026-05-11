@@ -130,7 +130,7 @@ class ReservationController extends Controller
                 'nb_adultes + nb_enfants'
             ));
 
-        return $event->capacite_totale - $reservees;
+        return $event->nombre_participants - $reservees;
     }
 
     /**
