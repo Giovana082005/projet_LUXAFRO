@@ -27,3 +27,9 @@ export const getAuthHeaders = () => ({
   Accept: "application/json",
   "X-XSRF-TOKEN": getXsrfToken(),
 });
+
+//Construit l'URL complète d'une image stockée sur le serveur Laravel
+export const getImageUrl = (path: string | null | undefined): string => {
+  if (!path) return "";
+  return `${API_URL}/storage/${path}`;
+};
