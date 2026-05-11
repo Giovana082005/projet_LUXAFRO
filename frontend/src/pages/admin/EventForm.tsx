@@ -2,25 +2,22 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { ArrowLeft, Save } from "lucide-react";
 import { useAdminEvents } from "../../hooks/useAdminEvents";
-import { API_URL } from "../../config/api";
+import { useCategories } from "../../hooks/useCategories";
+import { API_URL, getImageUrl } from "../../config/api";
 import type { Event } from "../../types/Event";
 import Spinner from "../../components/Spinner";
+import PhotoUploader from "../../components/admin/PhotoUploader";
+import CategoriesSelector from "../../components/admin/CategoriesSelector";
 
-/**
- * Formulaire de création/édition d'événement
- * Sert pour 2 routes :
- * - /admin/events/new (création)
- * - /admin/events/:id/edit (édition)
- */
 function EventForm() {
-  //Récupère l'ID depuis l'URL (undefined en mode création)
   const { id } = useParams<{ id?: string }>();
   const isEditMode = !!id;
   
   const navigate = useNavigate();
-  const { createEvent, updateEvent } = useAdminEvents();
+  const { createEvent, updateEvent, attachCategories, uploadPhoto, deletePhoto } = useAdminEvents();
+  const { categories } = useCategories();
 
-  //État du formulaire (un seul objet pour tous les champs)
+  // Données du formulaire
   const [formData, setFormData] = useState({
     nom: "",
     description: "",
@@ -33,12 +30,19 @@ function EventForm() {
     tarif: "",
   });
 
-  //États de gestion
+  //  États additionnels
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [currentPhotoId, setCurrentPhotoId] = useState<number | null>(null);
+  const [currentPhotoUrl, setCurrentPhotoUrl] = useState<string | null>(null);
+  const [photoToDelete, setPhotoToDelete] = useState(false);
+
+  //  États de gestion
   const [loadingEvent, setLoadingEvent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  //En mode édition : charger les données de l'événement
+  //  Chargement en mode édition
   useEffect(() => {
     if (isEditMode && id) {
       loadEvent(id);
@@ -57,11 +61,11 @@ function EventForm() {
 
       const event: Event = await res.json();
 
-      //Pré-remplit le formulaire avec les données existantes
+      //  Pré-remplir les champs
       setFormData({
         nom: event.nom,
         description: event.description,
-        date: event.date.split("T")[0], // "2026-05-31T..." → "2026-05-31"
+        date: event.date.split("T")[0],
         heure_debut: event.heure_debut?.substring(0, 5) || "",
         heure_fin: event.heure_fin?.substring(0, 5) || "",
         lieu: event.lieu,
@@ -69,6 +73,17 @@ function EventForm() {
         nombre_participants: event.nombre_participants?.toString() || "",
         tarif: event.tarif?.toString() || "",
       });
+
+      //  Pré-sélectionner les catégories
+      if (event.categories) {
+        setSelectedCategoryIds(event.categories.map((cat) => cat.id));
+      }
+
+      //  Charger la photo principale (la première)
+      if (event.photos && event.photos.length > 0) {
+        setCurrentPhotoId(event.photos[0].id);
+        setCurrentPhotoUrl(getImageUrl(event.photos[0].image_path));
+      }
     } catch (err) {
       setError("Impossible de charger l'événement");
       console.error(err);
@@ -77,30 +92,31 @@ function EventForm() {
     }
   };
 
-  //Gestion centralisée des changements de champs
+  //  Changement de champ
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = e.target;
-    
-    //Pour les checkbox
     const newValue = type === "checkbox" 
       ? (e.target as HTMLInputElement).checked 
       : value;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
   };
 
-  //Soumission du formulaire
+  //  Marquer la photo existante pour suppression
+  const handleRemoveCurrentPhoto = () => {
+    setPhotoToDelete(true);
+    setCurrentPhotoUrl(null);
+  };
+
+  //  Soumission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     setError("");
 
-    //Préparer les données (convertir les strings vides en null pour les champs nullable)
+    //  Préparer le payload de l'event
     const payload = {
       nom: formData.nom,
       description: formData.description,
@@ -115,21 +131,47 @@ function EventForm() {
       tarif: formData.tarif ? parseFloat(formData.tarif) : null,
     };
 
-    //Crée OU modifie selon le mode
-    const result = isEditMode && id
-      ? await updateEvent(parseInt(id), payload as never)
-      : await createEvent(payload as never);
+    try {
+      //  Créer ou modifier l'event
+      const eventResult = isEditMode && id
+        ? await updateEvent(parseInt(id), payload as never)
+        : await createEvent(payload as never);
 
-    setSubmitting(false);
+      if (!eventResult.success || !eventResult.event) {
+        throw new Error(eventResult.message || "Erreur lors de la sauvegarde");
+      }
 
-    if (result.success) {
+      const eventId = eventResult.event.id;
+
+      //  Attacher les catégories (si sélectionnées)
+      if (selectedCategoryIds.length > 0) {
+        await attachCategories(eventId, selectedCategoryIds);
+      }
+
+      //  Supprimer l'ancienne photo si demandé
+      if (photoToDelete && currentPhotoId) {
+        await deletePhoto(currentPhotoId);
+      }
+
+      //  Uploader la nouvelle photo (si présente)
+      if (photoFile) {
+        // En mode édition avec photo existante non supprimée : on remplace
+        if (isEditMode && currentPhotoId && !photoToDelete) {
+          await deletePhoto(currentPhotoId);
+        }
+        await uploadPhoto(eventId, photoFile);
+      }
+
+      // Tout est OK, redirection
       navigate("/admin/events");
-    } else {
-      setError(result.message || "Erreur lors de la sauvegarde");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Erreur inconnue";
+      setError(message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  //Chargement en mode édition
   if (loadingEvent) {
     return (
       <div className="flex justify-center py-20">
@@ -141,7 +183,7 @@ function EventForm() {
   return (
     <div>
       
-      {/* En-tête avec lien retour */}
+      {/*  En-tête */}
       <div className="mb-8">
         <Link
           to="/admin/events"
@@ -161,17 +203,20 @@ function EventForm() {
         </p>
       </div>
 
-      {/* Formulaire */}
+      {/*  Formulaire */}
       <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 max-w-3xl">
         
-        {/* ❌ Erreur */}
+        {/*  Erreur */}
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
             <p className="text-red-700 text-sm">❌ {error}</p>
           </div>
         )}
 
-        {/*  Nom */}
+        {/* ============================================ */}
+        {/*  Informations principales */}
+        {/* ============================================ */}
+
         <div className="mb-5">
           <label htmlFor="nom" className="block text-sm font-semibold text-gray-900 mb-2">
             Nom de l'événement <span className="text-red-500">*</span>
@@ -188,7 +233,6 @@ function EventForm() {
           />
         </div>
 
-        {/* Description */}
         <div className="mb-5">
           <label htmlFor="description" className="block text-sm font-semibold text-gray-900 mb-2">
             Description <span className="text-red-500">*</span>
@@ -205,9 +249,7 @@ function EventForm() {
           />
         </div>
 
-        {/*  Date + Heures en grille */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
-          
           <div>
             <label htmlFor="date" className="block text-sm font-semibold text-gray-900 mb-2">
               Date <span className="text-red-500">*</span>
@@ -253,7 +295,6 @@ function EventForm() {
           </div>
         </div>
 
-        {/*  Lieu */}
         <div className="mb-5">
           <label htmlFor="lieu" className="block text-sm font-semibold text-gray-900 mb-2">
             Lieu <span className="text-red-500">*</span>
@@ -270,9 +311,7 @@ function EventForm() {
           />
         </div>
 
-        {/* Places +  Tarif en grille */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-          
           <div>
             <label htmlFor="nombre_participants" className="block text-sm font-semibold text-gray-900 mb-2">
               Nombre de places
@@ -309,7 +348,6 @@ function EventForm() {
           </div>
         </div>
 
-        {/*  Pour enfants */}
         <div className="mb-6">
           <label className="flex items-center space-x-3 cursor-pointer">
             <input
@@ -323,6 +361,42 @@ function EventForm() {
               Cet événement est adapté aux enfants 👶
             </span>
           </label>
+        </div>
+
+        {/* ============================================ */}
+        {/*  Catégories */}
+        {/* ============================================ */}
+        <div className="mb-6 pt-6 border-t border-gray-200">
+          <label className="block text-sm font-semibold text-gray-900 mb-2">
+            Catégories
+          </label>
+          <p className="text-xs text-gray-500 mb-3">
+            Sélectionnez une ou plusieurs catégories
+          </p>
+          
+          <CategoriesSelector
+            categories={categories}
+            selectedIds={selectedCategoryIds}
+            onChange={setSelectedCategoryIds}
+          />
+        </div>
+
+        {/* ============================================ */}
+        {/* Photo */}
+        {/* ============================================ */}
+        <div className="mb-6 pt-6 border-t border-gray-200">
+          <label className="block text-sm font-semibold text-gray-900 mb-2">
+            Photo de l'événement
+          </label>
+          <p className="text-xs text-gray-500 mb-3">
+            Ajoutez une image principale (JPG, PNG, WEBP - max 4 Mo)
+          </p>
+          
+          <PhotoUploader
+            currentPhotoUrl={currentPhotoUrl}
+            onFileSelect={setPhotoFile}
+            onRemoveExisting={handleRemoveCurrentPhoto}
+          />
         </div>
 
         {/*  Actions */}
