@@ -44,10 +44,10 @@ function EventCard({ event }: EventCardProps) {
           <div className="flex flex-wrap gap-2 mb-4">
             {event.categories.map((cat) => (
               <span
-                key={cat}
+                key={cat.id}
                 className="bg-blue-50 text-blue-900 px-2.5 py-1 rounded-full text-xs font-semibold"
               >
-                {cat}
+                {cat.nom}
               </span>
             ))}
           </div>
