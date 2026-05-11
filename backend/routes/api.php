@@ -6,6 +6,7 @@ use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventPhotoController;
+use App\Http\Controllers\ReservationController;
 /*
 |--------------------------------------------------------------------------
 | ROUTES PUBLIQUES
