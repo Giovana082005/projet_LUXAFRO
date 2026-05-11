@@ -3,13 +3,16 @@ import type { Event } from "../types/Event";
 import { API_URL } from "../config/api";
 import { useAuth } from "./useAuth";
 
-export function useEvents() {
+/**
+ * Hook pour récupérer les événements
+ * @param category - Optionnel : filtre par nom de catégorie 
+ */
+export function useEvents(category?: string) {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [requiresAuth, setRequiresAuth] = useState(false);
 
-  //On récupère l'utilisateur connecté pour réagir aux changements
   const { user, loading: authLoading } = useAuth();
 
   const fetchEvents = async () => {
@@ -18,7 +21,13 @@ export function useEvents() {
     setRequiresAuth(false);
 
     try {
-      const res = await fetch(`${API_URL}/api/events`, {
+      // Construire l'URL avec le paramètre category si présent
+      const url = new URL(`${API_URL}/api/events`);
+      if (category) {
+        url.searchParams.append("category", category);
+      }
+
+      const res = await fetch(url.toString(), {
         credentials: "include",
         headers: {
           Accept: "application/json",
@@ -27,7 +36,7 @@ export function useEvents() {
 
       if (res.status === 401) {
         setRequiresAuth(true);
-        setEvents([]); //vider la liste si pas autorisé
+        setEvents([]);
         return;
       }
 
@@ -39,20 +48,19 @@ export function useEvents() {
       setEvents(data);
     } catch (err) {
       setError("Impossible de charger les événements");
-      setEvents([]); //Vider la liste en cas d'erreur
+      setEvents([]);
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  //Re-fetch à chaque changement d'utilisateur (login/logout)
+  // Re-fetch quand l'utilisateur OU la catégorie change
   useEffect(() => {
-    //On attend que useAuth ait fini de vérifier
     if (!authLoading) {
       fetchEvents();
     }
-  }, [user?.id, authLoading]);
+  }, [user?.id, authLoading, category]); 
 
   return { events, loading, error, requiresAuth, refresh: fetchEvents };
 }
