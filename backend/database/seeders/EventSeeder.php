@@ -4,11 +4,18 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Event;
+use App\Models\Category;
 
 class EventSeeder extends Seeder
 {
     public function run(): void
     {
+        /*
+        |--------------------------------------------------------------------------
+        | Création des catégories
+        |--------------------------------------------------------------------------
+        */
+
         $categories = [
             'musique',
             'sport',
@@ -17,29 +24,41 @@ class EventSeeder extends Seeder
             'festival'
         ];
 
+        foreach ($categories as $nom) {
+
+            Category::firstOrCreate([
+                'nom' => $nom
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Création des événements
+        |--------------------------------------------------------------------------
+        */
+
         for ($i = 1; $i <= 30; $i++) {
 
             // heure début aléatoire
-            $heureDebut = rand(8, 20); // entre 08h et 20h
+            $heureDebut = rand(8, 20);
 
-            // heure fin (toujours après début)
-            $heureFin = $heureDebut + rand(1, 3); // +1 à +3 heures
+            // heure fin après début
+            $heureFin = $heureDebut + rand(1, 3);
 
-            Event::create([
+            // création événement
+            $event = Event::create([
+
                 'nom' => 'Événement ' . $i,
+
                 'description' => 'Description de l’événement ' . $i,
 
                 'date' => now()->addDays(rand(1, 60)),
 
                 'heure_debut' => sprintf('%02d:00', $heureDebut),
+
                 'heure_fin' => sprintf('%02d:00', $heureFin),
 
                 'lieu' => 'Nancy',
-
-                'categories' => collect($categories)
-                    ->random(rand(1, 3))
-                    ->values()
-                    ->toArray(),
 
                 'pour_enfant' => rand(0, 1),
 
@@ -47,6 +66,18 @@ class EventSeeder extends Seeder
 
                 'tarif' => rand(0, 50),
             ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | Associer des catégories aléatoires
+            |--------------------------------------------------------------------------
+            */
+
+            $randomCategories = Category::inRandomOrder()
+                ->limit(rand(1, 3))
+                ->pluck('id');
+
+            $event->categories()->attach($randomCategories);
         }
     }
 }

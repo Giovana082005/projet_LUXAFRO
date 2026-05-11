@@ -6,23 +6,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class Event extends Model
 {
-    // Champs autorisés en création
+    // Champs autorisés
     protected $fillable = [
-    'nom',
-    'description',
-    'date',
-    'heure_debut',
-    'heure_fin',
-    'lieu',
-    'categories',
-    'pour_enfant',
-    'nombre_participants',
-    'tarif',
+        'nom',
+        'description',
+        'date',
+        'heure_debut',
+        'heure_fin',
+        'lieu',
+        'pour_enfant',
+        'nombre_participants',
+        'tarif',
     ];
 
     // Cast automatique des types
     protected $casts = [
-        'categories' => 'array',
         'pour_enfant' => 'boolean',
         'date' => 'date',
         'heure_debut' => 'string',
@@ -30,23 +28,21 @@ class Event extends Model
         'tarif' => 'decimal:2',
     ];
 
-    //  liste des catégories autorisées
-    public const CATEGORIES = [
-        'musique',
-        'sport',
-        'culture',
-        'danse',
-        'festival',
-    ];
+    /*
+    |--------------------------------------------------------------------------
+    | Relations
+    |--------------------------------------------------------------------------
+    */
 
-    //relation one to many 
-    public function photos()
+    // Relation many-to-many avec Category
+    public function categories()
     {
-    return $this->hasMany(EventPhoto::class);
+        return $this->belongsToMany(Category::class);
     }
 
-    public function reservations()
+    // Relation one-to-many avec les photos
+    public function photos()
     {
-    return $this->hasMany(Reservation::class);
+        return $this->hasMany(EventPhoto::class);
     }
 }

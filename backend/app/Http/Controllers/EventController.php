@@ -4,48 +4,64 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class EventController extends Controller
 {
-    //LISTE + FILTRES
-   public function index(Request $request)
+    /*
+    |--------------------------------------------------------------------------
+    | LISTE + FILTRES
+    |--------------------------------------------------------------------------
+    */
+
+    public function index(Request $request)
     {
-    $query = Event::with('photos');
+        $query = Event::with(['photos', 'categories']);
 
-    // recherche par nom
-    if ($request->filled('search')) {
-        $query->where('nom', 'like', '%' . $request->search . '%');
+        // recherche par nom
+        if ($request->filled('search')) {
+            $query->where('nom', 'like', '%' . $request->search . '%');
+        }
+
+        // filtre par catégorie
+        if ($request->filled('category')) {
+
+            $query->whereHas('categories', function ($q) use ($request) {
+                $q->where('nom', $request->category);
+            });
+        }
+
+        // filtre enfant
+        if ($request->filled('child')) {
+            $query->where('pour_enfant', true);
+        }
+
+        return response()->json($query->get());
     }
 
-    // filtre catégories
-    if ($request->filled('category')) {
-        $query->whereJsonContains('categories', $request->category);
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | CRÉATION
+    |--------------------------------------------------------------------------
+    */
 
-    // filtre enfant
-    if ($request->filled('child')) {
-        $query->where('pour_enfant', true);
-    }
-
-    return response()->json($query->get());
-    }
-
-    // CRÉATION
     public function store(Request $request)
     {
         $validated = $request->validate([
             'nom' => 'required|string',
             'description' => 'required|string',
+
             'date' => 'required|date',
 
             'heure_debut' => 'required',
+
             'heure_fin' => 'nullable|after:heure_debut',
 
             'lieu' => 'required|string',
-            'categories' => 'array',
+
             'pour_enfant' => 'boolean',
+
             'nombre_participants' => 'nullable|integer',
+
             'tarif' => 'nullable|numeric',
         ]);
 
@@ -54,26 +70,73 @@ class EventController extends Controller
         return response()->json($event, 201);
     }
 
-    //  DÉTAIL
+    /*
+    |--------------------------------------------------------------------------
+    | DÉTAIL
+    |--------------------------------------------------------------------------
+    */
+
     public function show($id)
     {
-    $event = Event::with('photos')->find($id);
+        $event = Event::with(['photos', 'categories'])->find($id);
 
-    if (!$event) {
-        return response()->json([
-            'message' => 'Événement non trouvé'
-        ], 404);
+        if (!$event) {
+
+            return response()->json([
+                'message' => 'Événement non trouvé'
+            ], 404);
+        }
+
+        return response()->json($event);
     }
 
-    return response()->json($event, 200);
+    /*
+    |--------------------------------------------------------------------------
+    | MODIFICATION
+    |--------------------------------------------------------------------------
+    */
+
+    public function update(Request $request, $id)
+    {
+        $event = Event::findOrFail($id);
+
+        $validated = $request->validate([
+            'nom' => 'required|string',
+
+            'description' => 'required|string',
+
+            'date' => 'required|date',
+
+            'heure_debut' => 'required',
+
+            'heure_fin' => 'nullable|after:heure_debut',
+
+            'lieu' => 'required|string',
+
+            'pour_enfant' => 'boolean',
+
+            'nombre_participants' => 'nullable|integer',
+
+            'tarif' => 'nullable|numeric',
+        ]);
+
+        $event->update($validated);
+
+        return response()->json($event);
     }
 
-    //  SUPPRESSION
+    /*
+    |--------------------------------------------------------------------------
+    | SUPPRESSION
+    |--------------------------------------------------------------------------
+    */
+
     public function destroy($id)
     {
         $event = Event::find($id);
 
         if (!$event) {
+
             return response()->json([
                 'message' => 'Événement non trouvé'
             ], 404);
@@ -86,56 +149,32 @@ class EventController extends Controller
         ]);
     }
 
-    // MODIFICATION
-    public function update(Request $request, $id)
+    /*
+    |--------------------------------------------------------------------------
+    | AJOUTER DES CATÉGORIES
+    |--------------------------------------------------------------------------
+    */
+
+    public function addCategories(Request $request, $id)
     {
         $event = Event::findOrFail($id);
 
         $validated = $request->validate([
-            'nom' => 'required|string',
-            'description' => 'required|string',
-            'date' => 'required|date',
+            'categories' => 'required|array',
 
-            'heure_debut' => 'required',
-            'heure_fin' => 'nullable|after:heure_debut',
-
-            'lieu' => 'required|string',
-            'categories' => 'array',
-            
-            'categories.*' => Rule::in(Event::CATEGORIES),
-            'pour_enfant' => 'boolean',
-            'nombre_participants' => 'nullable|integer',
-            'tarif' => 'nullable|numeric',
+            // ids des catégories
+            'categories.*' => 'exists:categories,id'
         ]);
 
-        $event->update($validated);
+        // ajoute sans supprimer les anciennes
+        $event->categories()->syncWithoutDetaching(
+            $validated['categories']
+        );
 
-        return response()->json($event);
+        return response()->json([
+            'message' => 'Catégories ajoutées avec succès',
+
+            'categories' => $event->categories
+        ]);
     }
-
-    public function addCategories(Request $request, $id)
-{
-    $event = Event::findOrFail($id);
-
-    $validated = $request->validate([
-        'categories' => 'required|array',
-        'categories.*' => 'string'
-    ]);
-
-    // récupérer les catégories existantes (ou tableau vide)
-    $existing = $event->categories ?? [];
-
-    // fusion sans doublons
-    $newCategories = array_unique(array_merge($existing, $validated['categories']));
-
-    // sauvegarde
-    $event->categories = $newCategories;
-    $event->save();
-
-    return response()->json([
-        'message' => 'Catégories ajoutées avec succès',
-        'categories' => $event->categories
-    ]);
-}
-
 }

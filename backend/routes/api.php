@@ -6,30 +6,25 @@ use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventPhotoController;
-use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\CategoryController;
+
 /*
 |--------------------------------------------------------------------------
 | ROUTES PUBLIQUES
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['web'])->group(function () {
+// AUTH
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
-    // AUTH
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
+// PASSWORD
+Route::post('/forgot-password', [PasswordResetController::class, 'forgotPassword']);
+Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
 
-    // PASSWORD
-    Route::post('/forgot-password', [PasswordResetController::class, 'forgotPassword']);
-    Route::post('/reset-password', [PasswordResetController::class, 'resetPassword']);
-
-    // EVENTS (PUBLIC)
-    Route::get('/events', [EventController::class, 'index']);
-    Route::get('/events/{id}', [EventController::class, 'show']);
-
-    //RESERVATIONS 
-    Route::post('/reservations', [ReservationController::class, 'store']);
-});
+// EVENTS PUBLICS
+Route::get('/events', [EventController::class, 'index']);
+Route::get('/events/{id}', [EventController::class, 'show']);
 
 
 /*
@@ -38,7 +33,7 @@ Route::middleware(['web'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['web', 'auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -56,10 +51,17 @@ Route::middleware(['web', 'auth:sanctum'])->group(function () {
         Route::post('/events', [EventController::class, 'store']);
         Route::put('/events/{id}', [EventController::class, 'update']);
         Route::delete('/events/{id}', [EventController::class, 'destroy']);
-        Route::post('/events/{id}/categories', [EventController::class, 'addCategories']);
+
+        // Catégories
+        Route::get('/categories', [CategoryController::class, 'index']);
+        Route::post('/categories', [CategoryController::class, 'store']);
+        Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+
+        // Photos
         Route::post('/events/{id}/photos', [EventPhotoController::class, 'store']);
         Route::delete('/photos/{id}', [EventPhotoController::class, 'destroy']);
 
+        // TEST ADMIN
         Route::get('/admin', function () {
             return response()->json([
                 'message' => 'Bienvenue admin'
