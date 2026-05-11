@@ -21,7 +21,7 @@ import EventDetails from "./pages/EventDetails";
 import Dashboard from "./pages/admin/Dashboard";
 import UsersManagement from "./pages/admin/UsersManagement";
 import EventsManagement from "./pages/admin/EventsManagement";
-
+import EventForm from "./pages/admin/EventForm";
 function App() {
   return (
     <Routes>
@@ -71,7 +71,12 @@ function App() {
         <Route path="users" element={<UsersManagement />} />
         {/* /admin/events → Gestion événements */}
         <Route path="events" element={<EventsManagement />} />
-      </Route>
+        {/* Création */}
+        <Route path="events/new" element={<EventForm />} />
+
+        {/* Édition */}
+        <Route path="events/:id/edit" element={<EventForm />} />
+              </Route>
       
     </Routes>
   );
