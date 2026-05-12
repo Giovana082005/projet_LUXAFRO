@@ -37,24 +37,11 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         
         {/* Routes protégées (utilisateur connecté requis) */}
-        <Route
-          path="/events"
-          element={
-            <ProtectedRoute>
-              <Events />
-            </ProtectedRoute>
-          }
-        />
-      </Route>
+        <Route path="/events" element={<Events /> }/>
       {/* Détail d'un événement */}
-      <Route
-        path="/events/:id"
-        element={
-          <ProtectedRoute>
-            <EventDetail />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/events/:id"element={<EventDetail />}/>
+      </Route>
+      
 
       {/* Routes ADMIN (avec AdminLayout dédié) */}
       <Route 
