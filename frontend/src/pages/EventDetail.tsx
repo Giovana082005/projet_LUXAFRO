@@ -7,11 +7,15 @@ import {
   Users, 
   Euro, 
   Baby,
-  AlertCircle
+  AlertCircle,
+  LogIn
 } from "lucide-react";
 import { useEvent } from "../hooks/useEvent";
 import { getImageUrl } from "../config/api";
 import Spinner from "../components/Spinner";
+import { useState } from "react"; 
+import ReservationModal from "../components/ReservationModal"; 
+import { useAuth } from "../hooks/useAuth"; 
 
 /**
  *  Page détail d'un événement
@@ -21,6 +25,10 @@ function EventDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { event, loading, error, notFound } = useEvent(id);
+  const [showModal, setShowModal] = useState(false);
+
+  // On récupère l'état de connexion
+const { isAuthenticated } = useAuth();
 
   //  Formater la date complète
   const formatDate = (dateString: string) => {
@@ -298,18 +306,53 @@ function EventDetail() {
                 )}
               </div>
 
-              {/*  CTA inscription (placeholder) */}
-              <button
-                type="button"
-                className="mt-6 w-full bg-blue-950 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors shadow-md"
-                onClick={() => alert("Fonctionnalité d'inscription à venir !")}
-              >
-                S'inscrire à l'événement
-              </button>
+              {/*  inscription */}
+              {isAuthenticated ? (
+  // ✅ Connecté : ouvre la modal
+  <button
+    type="button"
+    onClick={() => setShowModal(true)}
+    className="mt-6 w-full bg-blue-950 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg"
+  >
+    S'inscrire à l'événement
+  </button>
+                  ) : (
+                    //Non connecté : invite à se connecter
+                    <div className="mt-6 space-y-3">
+                      <Link
+                        to="/login"
+                        state={{ from: `/events/${event.id}`, message: "Connectez-vous pour vous inscrire à cet événement" }}
+                        className="w-full bg-blue-950 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+                      >
+                        <LogIn size={18} />
+                        <span>Se connecter pour s'inscrire</span>
+                      </Link>
+                      <p className="text-center text-xs text-gray-500">
+                        Pas encore de compte ?{" "}
+                        <Link 
+                          to="/register" 
+                          state={{ 
+                            from: `/events/${event.id}`, 
+                            message: "Votre compte est créé ! Connectez-vous pour finaliser votre inscription." 
+                          }}
+                          className="text-blue-700 hover:underline font-medium"
+                        >
+                          S'inscrire gratuitement
+                        </Link>
+                      </p>
+                    </div>
+                  )}
             </div>
           </div>
         </div>
       </section>
+      {/* 🪟 Modal de réservation */}
+      {showModal && (
+        <ReservationModal
+          event={event}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 }

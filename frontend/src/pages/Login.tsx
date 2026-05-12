@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link,useLocation } from "react-router-dom";
 import type { User } from "../types/User";
 import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
 import Spinner from "../components/Spinner";
@@ -11,6 +11,11 @@ function Login() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  //Message depuis la page précédente (ex: "Connectez-vous pour vous inscrire")
+  const location = useLocation();
+  const fromMessage = location.state?.message as string | undefined;
+  const fromUrl = location.state?.from as string | undefined;
 
   //Utilisation du Context d'auth
   const { user, loading: authLoading, refresh } = useAuth();
@@ -51,9 +56,13 @@ function Login() {
       if (!res.ok) {
         setMessage(data.message || "Erreur login");
       } else {
-        //Rafraîchir le Context AVANT de naviguer
         await refresh();
-        redirectByRole(data.user);
+        //Si on vient d'une page spécifique, on y retourne
+        if (fromUrl) {
+          navigate(fromUrl);
+        } else {
+          redirectByRole(data.user);
+        }
       }
     } catch {
       setMessage("Erreur serveur");
@@ -66,6 +75,12 @@ function Login() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md text-white">
         <h2 className="text-3xl font-bold mb-6 text-center">Connexion</h2>
+        {/* Message contextuel si on vient d'une page protégée */}
+        {fromMessage && (
+          <div className="bg-blue-950/30 border border-blue-500/30 rounded-lg p-3 mb-4 text-center">
+            <p className="text-blue-300 text-sm">{fromMessage}</p>
+          </div>
+        )}
 
         <div className="space-y-4">
           <input
