@@ -34,6 +34,7 @@ class Reservation extends Model
         'nb_adultes' => 'integer',
         'nb_enfants' => 'integer',
         'total_price' => 'float',
+        'status' => 'string',
     ];
 
     /**

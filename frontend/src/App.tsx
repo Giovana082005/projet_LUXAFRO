@@ -15,11 +15,13 @@ import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Events from "./pages/Events";
+import EventDetail from "./pages/EventDetail";
 
 //Pages admin
 import Dashboard from "./pages/admin/Dashboard";
 import UsersManagement from "./pages/admin/UsersManagement";
-
+import EventsManagement from "./pages/admin/EventsManagement";
+import EventForm from "./pages/admin/EventForm";
 function App() {
   return (
     <Routes>
@@ -44,6 +46,15 @@ function App() {
           }
         />
       </Route>
+      {/* Détail d'un événement */}
+      <Route
+        path="/events/:id"
+        element={
+          <ProtectedRoute>
+            <EventDetail />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Routes ADMIN (avec AdminLayout dédié) */}
       <Route 
@@ -59,8 +70,14 @@ function App() {
         
         {/* /admin/users : Gestion utilisateurs */}
         <Route path="users" element={<UsersManagement />} />
-        
-      </Route>
+        {/* /admin/events → Gestion événements */}
+        <Route path="events" element={<EventsManagement />} />
+        {/* Création */}
+        <Route path="events/new" element={<EventForm />} />
+
+        {/* Édition */}
+        <Route path="events/:id/edit" element={<EventForm />} />
+              </Route>
       
     </Routes>
   );

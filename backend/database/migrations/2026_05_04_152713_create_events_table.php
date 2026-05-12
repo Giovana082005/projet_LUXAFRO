@@ -12,26 +12,29 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('events', function (Blueprint $table) {
-        $table->id();
 
-        $table->string('nom');
-        $table->text('description');
+            $table->id();
 
-        $table->date('date');
-        $table->time('horaire');
+            $table->string('nom');
 
-        $table->string('lieu');
+            $table->text('description');
 
-        $table->json('categories');
+            $table->date('date');
 
-        $table->boolean('pour_enfant')->default(false);
+            $table->time('heure_debut');
 
-        $table->integer('nombre_participants')->nullable();
+            $table->time('heure_fin')->nullable();
 
-        $table->decimal('tarif', 8, 2)->nullable();
+            $table->string('lieu');
 
-        $table->timestamps();
-    });
+            $table->boolean('pour_enfant')->default(false);
+
+            $table->integer('nombre_participants')->nullable();
+
+            $table->decimal('tarif', 8, 2)->nullable();
+
+            $table->timestamps();
+        });
     }
 
     /**
