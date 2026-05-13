@@ -22,6 +22,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import UsersManagement from "./pages/admin/UsersManagement";
 import EventsManagement from "./pages/admin/EventsManagement";
 import EventForm from "./pages/admin/EventForm";
+import MyReservations from "./pages/MyReservations";
 function App() {
   return (
     <Routes>
@@ -35,13 +36,14 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        
-        {/* Routes protégées (utilisateur connecté requis) */}
         <Route path="/events" element={<Events /> }/>
-      {/* Détail d'un événement */}
-      <Route path="/events/:id"element={<EventDetail />}/>
+        <Route path="/events/:id"element={<EventDetail />}/>
+
+        {/* Routes protégées*/}
+        {/* Mes réservations (utilisateur connecté requis) */}
+        <Route path="/mes-reservations"element={<ProtectedRoute><MyReservations /></ProtectedRoute> } />
       </Route>
-      
+
 
       {/* Routes ADMIN (avec AdminLayout dédié) */}
       <Route 
