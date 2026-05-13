@@ -111,11 +111,6 @@ function ReservationModal({ event, onClose }: ReservationModalProps) {
               Fermer
             </button>
           </div>
-
-          {/* Badge mock */}
-          <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-full px-3 py-1 mt-4 inline-block">
-            ⚠️ Mode démonstration — backend non connecté
-          </p>
         </div>
       </div>
     );

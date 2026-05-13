@@ -8,6 +8,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventPhotoController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\ContactController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,10 @@ Route::middleware(['web'])->group(function () {
     // EVENTS (lecture)
     Route::get('/events', [EventController::class, 'index']);
     Route::get('/events/{id}', [EventController::class, 'show']);
+
+    //formulaire de contact
+    Route::post('/contacts',[ContactController::class, 'store']);
+    Route::get('/contacts',[ContactController::class, 'index']);
 });
 
 
