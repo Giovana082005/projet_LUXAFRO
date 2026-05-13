@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-import { useNavigate, Link,useLocation } from "react-router-dom";
+import { useState, useEffect, useRef } from "react"; // 🆕 useRef
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import type { User } from "../types/User";
 import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
 import Spinner from "../components/Spinner";
-import { useAuth } from "../hooks/useAuth"; 
+import { useAuth } from "../hooks/useAuth";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -12,22 +12,30 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  //Message depuis la page précédente (ex: "Connectez-vous pour vous inscrire")
+  // 🎯 Message et URL de provenance
   const location = useLocation();
-  const fromMessage = location.state?.message as string | undefined;
-  const fromUrl = location.state?.from as string | undefined;
+  const fromMessage = typeof location.state?.message === "string"
+    ? location.state.message
+    : undefined;
+  const fromUrl = typeof location.state?.from === "string"
+    ? location.state.from
+    : undefined;
 
-  //Utilisation du Context d'auth
+  // 🎯 Context d'auth
   const { user, loading: authLoading, refresh } = useAuth();
 
-  //Redirection automatique si déjà connecté
+  // 🆕 Flag pour distinguer "déjà connecté au chargement" vs "vient de se logger"
+  const justLoggedIn = useRef(false);
+
+  // 🎯 Redirection automatique si DÉJÀ connecté au chargement
+  // (mais PAS si on vient de se logger → géré dans handleLogin)
   useEffect(() => {
-    if (!authLoading && user) {
+    if (!authLoading && user && !justLoggedIn.current) {
       redirectByRole(user);
     }
   }, [user, authLoading]);
 
-  //Rediriger selon le rôle
+  // 🔀 Rediriger selon le rôle
   const redirectByRole = (user: User) => {
     if (user.role === "administrateur") {
       navigate("/admin");
@@ -36,7 +44,7 @@ function Login() {
     }
   };
 
-  //Login
+  // 🔐 Login
   const handleLogin = async () => {
     setLoading(true);
     setMessage("");
@@ -56,15 +64,23 @@ function Login() {
       if (!res.ok) {
         setMessage(data.message || "Erreur login");
       } else {
-        await refresh();
-        //Si on vient d'une page spécifique, on y retourne
+        // 🆕 On signale qu'on vient de se logger
+        // → empêche le useEffect de rediriger à sa place
+        justLoggedIn.current = true;
+
+        await refresh(); // Met à jour le Context
+
+        // 🎯 Redirection prioritaire :
+        // 1. Si on vient d'une page spécifique → on y retourne
+        // 2. Sinon → redirection selon le rôle
         if (fromUrl) {
           navigate(fromUrl);
         } else {
           redirectByRole(data.user);
         }
       }
-    } catch {
+    } catch (err) {
+      console.error("❌ Erreur login:", err);
       setMessage("Erreur serveur");
     } finally {
       setLoading(false);
@@ -75,7 +91,8 @@ function Login() {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md text-white">
         <h2 className="text-3xl font-bold mb-6 text-center">Connexion</h2>
-        {/* Message contextuel si on vient d'une page protégée */}
+
+        {/* 🎯 Message contextuel si on vient d'une page protégée */}
         {fromMessage && (
           <div className="bg-blue-950/30 border border-blue-500/30 rounded-lg p-3 mb-4 text-center">
             <p className="text-blue-300 text-sm">{fromMessage}</p>
