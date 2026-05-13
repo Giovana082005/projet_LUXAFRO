@@ -40,7 +40,8 @@ function Header() {
   //Liens de navigation
   const navLinks = [
     { to: "/", label: "Accueil" },
-    { to: "/events", label: "Événements" }
+    { to: "/events", label: "Événements" },
+    { to: "/contact", label: "Contact" }
   ];
 
   return (
