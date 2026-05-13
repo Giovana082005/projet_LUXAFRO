@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventPhotoController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ReservationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,7 +27,7 @@ Route::middleware(['web'])->group(function () {
     //CATÉGORIES (lecture publique)
     Route::get('/categories', [CategoryController::class, 'index']);
 
-     // EVENTS (lecture)
+    // EVENTS (lecture)
     Route::get('/events', [EventController::class, 'index']);
     Route::get('/events/{id}', [EventController::class, 'show']);
 });
@@ -41,6 +42,14 @@ Route::middleware(['web', 'auth:sanctum'])->group(function () {
 
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::post('/reservations', [ReservationController::class, 'store']);
+
+    Route::get('/reservations/me', [ReservationController::class, 'myReservations']);
+
+    Route::get('/reservations/{id}', [ReservationController::class, 'show']);
+
+    Route::post('/reservations/{id}', [ReservationController::class, 'cancel']);
 
     /*
     |--------------------------------------------------------------------------
