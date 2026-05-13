@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import type { Reservation, CreateReservationData } from "../types/Reservation";
-// import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
+ import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
 
 // MODE MOCK : à passer à false quand le backend sera prêt
 
-const USE_MOCKS = true;
+const USE_MOCKS = false;
 
 
 //DONNÉES FICTIVES (uniquement utilisées en mode mock)
@@ -92,14 +92,14 @@ export function useReservations() {
         await fakeDelay();
         setReservations(mockReservations);
       } else {
-        // VRAI APPEL API (à activer quand backend prêt)
-        // const res = await fetch(`${API_URL}/api/reservations/me`, {
-        //   credentials: "include",
-        //   headers: { Accept: "application/json" },
-        // });
-        // if (!res.ok) throw new Error("Erreur");
-        // const data = await res.json();
-        // setReservations(data);
+        // VRAI APPEL API 
+         const res = await fetch(`${API_URL}/api/reservations/me`, {
+           credentials: "include",
+           headers: { Accept: "application/json" },
+         });
+         if (!res.ok) throw new Error("Erreur");
+         const data = await res.json();
+         setReservations(data);
       }
     } catch (err) {
       setError("Impossible de charger les réservations");
@@ -136,18 +136,18 @@ export function useReservations() {
         return { success: true, reservation: fakeReservation };
       } else {
         // VRAI APPEL API
-        // await getCsrfCookie();
-        // const res = await fetch(`${API_URL}/api/reservations`, {
-        //   method: "POST",
-        //   credentials: "include",
-        //   headers: getAuthHeaders(),
-        //   body: JSON.stringify(data),
-        // });
-        // const result = await res.json();
-        // if (!res.ok) throw new Error(result.message || "Erreur");
-        // setReservations((prev) => [result.reservation, ...prev]);
-        // return { success: true, reservation: result.reservation };
-        return { success: false, message: "Backend non implémenté" };
+        await getCsrfCookie();
+         const res = await fetch(`${API_URL}/api/reservations`, {
+           method: "POST",
+          credentials: "include",
+          headers: getAuthHeaders(),
+          body: JSON.stringify(data),
+         });
+         const result = await res.json();
+         if (!res.ok) throw new Error(result.message || "Erreur");
+        setReservations((prev) => [result.reservation, ...prev]);
+         return { success: true, reservation: result.reservation };
+        //return { success: false, message: "Backend non implémenté" };
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erreur inconnue";
@@ -171,18 +171,18 @@ export function useReservations() {
         return { success: true };
       } else {
         //VRAI APPEL API
-        // await getCsrfCookie();
-        // const res = await fetch(`${API_URL}/api/reservations/${id}/cancel`, {
-        //   method: "POST",
-        //   credentials: "include",
-        //   headers: getAuthHeaders(),
-        // });
-        // if (!res.ok) throw new Error("Erreur lors de l'annulation");
-        // setReservations((prev) =>
-        //   prev.map((r) => (r.id === id ? { ...r, status: "cancelled" as const } : r))
-        // );
-        // return { success: true };
-        return { success: false, message: "Backend non implémenté" };
+        await getCsrfCookie();
+        const res = await fetch(`${API_URL}/api/reservations/${id}`, {
+          method: "POST",
+          credentials: "include",
+          headers: getAuthHeaders(),
+         });
+         if (!res.ok) throw new Error("Erreur lors de l'annulation");
+         setReservations((prev) =>
+           prev.map((r) => (r.id === id ? { ...r, status: "cancelled" as const } : r))
+        );
+         return { success: true };
+        //return { success: false, message: "Backend non implémenté" };
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Erreur inconnue";
