@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, LogIn, LogOut, User as UserIcon, Shield } from "lucide-react";
+import { Menu, X, LogIn, LogOut, User as UserIcon, Shield,Ticket } from "lucide-react";
 import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
 import { useAuth } from "../hooks/useAuth"; // 🆕 Source unique de vérité
 
@@ -79,6 +79,14 @@ function Header() {
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-3">
+                {/* Lien Mes réservations */}
+                <Link
+                  to="/mes-reservations"
+                  className="flex items-center space-x-2 text-gray-300 hover:text-white text-sm font-medium transition-colors"
+                >
+                  <Ticket size={16} />
+                  <span>Mes réservations</span>
+                </Link>
                 
                 {/*Lien Admin (visible uniquement pour les admins) */}
                 {user.role === "administrateur" && (
@@ -146,6 +154,14 @@ function Header() {
               <div className="border-t border-gray-800 pt-3 mt-3">
                 {user ? (
                   <div className="space-y-2">
+                    {/*Mes réservations mobile */}
+                    <Link
+                      to="/mes-reservations"
+                      className="flex items-center space-x-2 text-gray-300 hover:bg-gray-800 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      <Ticket size={16} />
+                      <span>Mes réservations</span>
+                    </Link>
                     
                     {/*Lien Admin mobile */}
                     {user.role === "administrateur" && (
