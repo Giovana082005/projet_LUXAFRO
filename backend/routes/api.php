@@ -9,7 +9,7 @@ use App\Http\Controllers\EventPhotoController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ContactController;
-
+use App\Http\Controllers\UserActivityController;
 /*
 |--------------------------------------------------------------------------
 | ROUTES PUBLIQUES (avec session web)
@@ -35,6 +35,7 @@ Route::middleware(['web'])->group(function () {
     //formulaire de contact
     Route::post('/contacts',[ContactController::class, 'store']);
     Route::get('/contacts',[ContactController::class, 'index']);
+
 });
 
 
@@ -44,6 +45,9 @@ Route::middleware(['web'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['web', 'auth:sanctum'])->group(function () {
+
+    //TRaffic IA 
+    Route::post('/activity', [UserActivityController::class, 'store']);
 
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);

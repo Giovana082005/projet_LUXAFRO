@@ -7,6 +7,7 @@ import AdminLayout from "./components/admin/AdminLayout";
 //Protections de routes
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import TrafficSimulator from "./components/TrafficSimulator";
 
 //Pages publiques
 import Home from "./pages/Home";
@@ -26,6 +27,8 @@ import MyReservations from "./pages/MyReservations";
 import ContactForm from "./pages/ContactForm";
 function App() {
   return (
+    <>
+    <TrafficSimulator />
     <Routes>
       
       {/* Routes avec Layout principal (Header + Footer) */}
@@ -71,6 +74,7 @@ function App() {
               </Route>
       
     </Routes>
+    </>
   );
 }
 
