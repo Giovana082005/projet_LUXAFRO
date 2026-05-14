@@ -1,4 +1,4 @@
-import axios from "axios";
+/*import axios from "axios";
 import { Event, CreateEvent } from "../types/Event";
 
 const API_URL = "http://localhost:8000/api";
@@ -38,4 +38,4 @@ export const updateEvent = (
 // récupérer un événement par ID
 export const getEventById = (id: number) => {
   return axios.get(`${API_URL}/events/${id}`);
-};
+};*/

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link ,useLocation} from "react-router-dom";
 
 import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
 import Spinner from "../components/Spinner";
@@ -12,6 +12,12 @@ function Register() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
+
+  //Récupère le contexte de navigation
+  // (ex: si on vient d'une page d'événement qui demandait une connexion)
+  const location = useLocation();
+  const fromUrl = location.state?.from as string | undefined;
+  const fromMessage = location.state?.message as string | undefined;
 
   const handleRegister = async () => {
     setLoading(true);
@@ -38,8 +44,17 @@ function Register() {
         setMessage("Compte créé avec succès !");
         //Rediriger vers le login
         setTimeout(() => {
-          navigate("/login");
-        }, 2000);
+        // On transmet le state original vers login
+        // pour que l'utilisateur soit redirigé vers l'événement après connexion
+        navigate("/login", {
+          state: {
+            from: fromUrl,
+            message: fromUrl
+              ? "Votre compte est créé ! Connectez-vous pour finaliser votre inscription."
+              : undefined,
+          },
+        });
+      }, 2000);
       }
     } catch {
       setMessage("Erreur serveur");

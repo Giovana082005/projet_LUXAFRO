@@ -21,7 +21,8 @@ return new class extends Migration {
             $table->enum('status', [
                 'pending',
                 'confirmed',
-                'cancelled'
+                'cancelled',
+                'paid'
             ])->default('pending');
 
             $table->enum('payment_method', [

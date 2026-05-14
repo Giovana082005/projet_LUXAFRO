@@ -38,6 +38,11 @@ function Footer() {
                   Événements
                 </Link>
               </li>
+              <li>
+                <Link to="/contact" className="hover:text-blue-400 transition-colors">
+                  Contact
+                </Link>
+              </li>
              
             </ul>
           </div>
