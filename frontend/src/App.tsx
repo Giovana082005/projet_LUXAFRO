@@ -23,7 +23,7 @@ import UsersManagement from "./pages/admin/UsersManagement";
 import EventsManagement from "./pages/admin/EventsManagement";
 import EventForm from "./pages/admin/EventForm";
 import MyReservations from "./pages/MyReservations";
-import ContactForm from "./pages/ContactForm";
+import Contact from "./pages/Contact";
 function App() {
   return (
     <Routes>
@@ -39,7 +39,7 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/events" element={<Events /> }/>
         <Route path="/events/:id"element={<EventDetail />}/>
-        <Route path="/contact"element={<ContactForm />}/>
+        <Route path="/contact"element={<Contact />}/>
 
         {/* Routes protégées*/}
         {/* Mes réservations (utilisateur connecté requis) */}
