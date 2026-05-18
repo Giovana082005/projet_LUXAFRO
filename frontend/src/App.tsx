@@ -24,6 +24,7 @@ import EventsManagement from "./pages/admin/EventsManagement";
 import EventForm from "./pages/admin/EventForm";
 import MyReservations from "./pages/MyReservations";
 import Contact from "./pages/Contact";
+import AdminContactMessages from "./pages/admin/AdminContactMessages"
 function App() {
   return (
     <Routes>
@@ -68,7 +69,8 @@ function App() {
 
         {/* Édition */}
         <Route path="events/:id/edit" element={<EventForm />} />
-              </Route>
+        <Route path="contacts" element={<AdminContactMessages />} />
+      </Route>
       
     </Routes>
   );
