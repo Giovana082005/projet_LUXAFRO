@@ -1,73 +1,65 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { 
-  ArrowLeft, 
-  Calendar, 
-  Clock, 
-  MapPin, 
-  Users, 
-  Euro, 
+import {
+  ArrowLeft,
+  Calendar,
+  Clock,
+  MapPin,
+  Users,
+  Euro,
   Baby,
   AlertCircle,
-  LogIn
+  LogIn,
 } from "lucide-react";
 import { useEvent } from "../hooks/useEvent";
 import { getImageUrl } from "../config/api";
 import Spinner from "../components/Spinner";
-import { useState } from "react"; 
-import ReservationModal from "../components/ReservationModal"; 
-import { useAuth } from "../hooks/useAuth"; 
+import { useState } from "react";
+import ReservationModal from "../components/ReservationModal";
+import { useAuth } from "../hooks/useAuth";
 
 /**
- *  Page détail d'un événement
- * Affiche toutes les infos d'un événement avec sa photo en grand
+ * Page détail d'un événement
+ * Style : sobre, aéré, hiérarchie claire
  */
 function EventDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { event, loading, error, notFound } = useEvent(id);
   const [showModal, setShowModal] = useState(false);
+  const { isAuthenticated } = useAuth();
 
-  // On récupère l'état de connexion
-const { isAuthenticated } = useAuth();
-
-  //  Formater la date complète
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("fr-FR", {
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString("fr-FR", {
       weekday: "long",
       day: "numeric",
       month: "long",
       year: "numeric",
     });
-  };
 
-  //  Formater les horaires
-  const formatTime = (timeString: string | null) => {
-    if (!timeString) return "";
-    return timeString.substring(0, 5);
-  };
+  const formatTime = (timeString: string | null) =>
+    timeString ? timeString.substring(0, 5) : "";
 
-  //  État de chargement
-  if (loading) {
-    return <Spinner fullScreen />;
-  }
+  // ============================================
+  // ÉTATS DE CHARGEMENT / ERREUR
+  // ============================================
+  if (loading) return <Spinner fullScreen />;
 
-  //  Événement introuvable
   if (notFound) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center px-4">
+      <div className="min-h-screen bg-white flex items-center justify-center px-6">
         <div className="text-center max-w-md">
-          <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <AlertCircle size={32} className="text-blue-700" />
+          <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <AlertCircle size={28} className="text-blue-700" />
           </div>
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+          <h1 className="text-2xl font-semibold text-gray-900 mb-3">
             Événement introuvable
           </h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-8 leading-relaxed">
             L'événement que vous cherchez n'existe pas ou a été supprimé.
           </p>
           <Link
             to="/events"
-            className="inline-flex items-center space-x-2 bg-blue-950 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            className="inline-flex items-center space-x-2 bg-blue-950 hover:bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
           >
             <ArrowLeft size={18} />
             <span>Retour aux événements</span>
@@ -77,11 +69,10 @@ const { isAuthenticated } = useAuth();
     );
   }
 
-  //  Erreur technique
   if (error) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center px-4">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md text-center">
+      <div className="min-h-screen bg-white flex items-center justify-center px-6">
+        <div className="bg-red-50 border border-red-100 rounded-2xl p-8 max-w-md text-center">
           <p className="text-red-700 mb-4 font-medium">❌ {error}</p>
           <button
             onClick={() => navigate(-1)}
@@ -96,84 +87,79 @@ const { isAuthenticated } = useAuth();
 
   if (!event) return null;
 
-  //  Photo principale
-  const photoUrl = event.photos && event.photos.length > 0
-    ? getImageUrl(event.photos[0].image_path)
-    : null;
+  const photoUrl =
+    event.photos && event.photos.length > 0
+      ? getImageUrl(event.photos[0].image_path)
+      : null;
 
   return (
     <div className="min-h-screen bg-white">
-      
+
       {/* ============================================ */}
-      {/*  SECTION HÉRO avec photo en grand */}
+      {/* HERO */}
       {/* ============================================ */}
       <section className="relative">
-        
         {photoUrl ? (
-          //  Avec photo : image en grand avec overlay
-          <div className="relative h-[400px] md:h-[500px] overflow-hidden">
+          <div className="relative h-[420px] md:h-[520px] lg:h-[560px] overflow-hidden">
             <img
               src={photoUrl}
               alt={event.nom}
               className="w-full h-full object-cover"
             />
-            {/* Overlay dégradé sombre */}
-            <div className="absolute inset-0 bg-gradient-to-t from-blue-950/95 via-blue-950/40 to-transparent"></div>
-            
-            {/*  Bouton retour en haut à gauche */}
-            <div className="absolute top-6 left-6">
+            {/* Gradient plus subtil → la photo respire davantage */}
+            <div className="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-blue-950/30 to-blue-950/10"></div>
+
+            {/* Bouton retour discret */}
+            <div className="absolute top-6 left-6 md:top-8 md:left-8">
               <Link
                 to="/events"
-                className="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20"
+                className="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20"
               >
                 <ArrowLeft size={16} />
                 <span>Retour</span>
               </Link>
             </div>
 
-            {/*  Titre en bas */}
-            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
+            {/* Titre en bas du hero */}
+            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 lg:p-14">
               <div className="max-w-5xl mx-auto">
-                {/* Catégories en haut du titre */}
                 {event.categories && event.categories.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-3">
+                  <div className="flex flex-wrap gap-2 mb-4">
                     {event.categories.map((cat) => (
                       <span
                         key={cat.id}
-                        className="bg-white/15 backdrop-blur-sm border border-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold"
+                        className="bg-white/15 backdrop-blur-sm border border-white/20 text-white px-3 py-1 rounded-full text-xs font-medium"
                       >
                         {cat.nom}
                       </span>
                     ))}
                   </div>
                 )}
-                
-                <h1 className="text-3xl md:text-5xl lg:text-6xl font-light text-white leading-tight">
+
+                <h1 className="text-3xl md:text-5xl lg:text-6xl font-light text-white leading-tight max-w-3xl">
                   {event.nom}
                 </h1>
               </div>
             </div>
           </div>
         ) : (
-          //  Sans photo : header bleu marine
-          <div className="bg-blue-950 py-16 md:py-24 px-6">
+          // Version sans photo : header bleu marine plus aéré
+          <div className="bg-blue-950 py-20 md:py-28 lg:py-32 px-6">
             <div className="max-w-5xl mx-auto">
-              {/* Bouton retour */}
               <Link
                 to="/events"
-                className="inline-flex items-center space-x-2 text-white/80 hover:text-white text-sm font-medium mb-6 transition-colors"
+                className="inline-flex items-center space-x-2 text-white/70 hover:text-white text-sm font-medium mb-8 transition-colors"
               >
                 <ArrowLeft size={16} />
                 <span>Retour</span>
               </Link>
 
-              {/* Catégories */}
               {event.categories && event.categories.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex flex-wrap gap-2 mb-5">
                   {event.categories.map((cat) => (
                     <span
                       key={cat.id}
-                      className="bg-white/15 backdrop-blur-sm border border-white/20 text-white px-3 py-1 rounded-full text-xs font-semibold"
+                      className="bg-white/15 backdrop-blur-sm border border-white/20 text-white px-3 py-1 rounded-full text-xs font-medium"
                     >
                       {cat.nom}
                     </span>
@@ -181,7 +167,7 @@ const { isAuthenticated } = useAuth();
                 </div>
               )}
 
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-light text-white leading-tight">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-light text-white leading-tight max-w-3xl">
                 {event.nom}
               </h1>
             </div>
@@ -190,169 +176,171 @@ const { isAuthenticated } = useAuth();
       </section>
 
       {/* ============================================ */}
-      {/*  SECTION DÉTAILS */}
+      {/* CONTENU */}
       {/* ============================================ */}
-      <section className="max-w-5xl mx-auto px-6 py-12 lg:py-16">
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/*  Colonne gauche : Description */}
+      <section className="max-w-5xl mx-auto px-6 py-16 lg:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12">
+
+          {/* COLONNE GAUCHE : Description */}
           <div className="lg:col-span-2">
-            <h2 className="text-xs uppercase tracking-wider text-blue-700 font-semibold mb-3">
-              À propos de cet événement
+            <h2 className="text-xs uppercase tracking-[0.15em] text-blue-700 font-semibold mb-4">
+              À propos
             </h2>
-            
-            <p className="text-gray-700 text-base leading-relaxed whitespace-pre-line">
+
+            <p className="text-gray-700 text-base md:text-lg leading-relaxed whitespace-pre-line">
               {event.description}
             </p>
 
-            {/*  Badge enfants si applicable */}
+            {/* Badge enfants — harmonisé avec le reste */}
             {event.pour_enfant && (
-              <div className="mt-6 inline-flex items-center space-x-2 bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded-lg">
-                <Baby size={18} />
-                <span className="font-medium">Cet événement est adapté aux enfants</span>
+              <div className="mt-8 inline-flex items-center space-x-2 bg-blue-50 border border-blue-100 text-blue-900 px-4 py-2 rounded-lg">
+                <Baby size={16} className="text-blue-700" />
+                <span className="text-sm font-medium">
+                  Adapté aux enfants
+                </span>
               </div>
             )}
           </div>
 
-          {/*  Colonne droite : Infos pratiques (sticky) */}
+          {/* COLONNE DROITE : Sidebar Infos pratiques */}
           <div className="lg:col-span-1">
-            <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 lg:sticky lg:top-24">
-              
-              <h2 className="text-xs uppercase tracking-wider text-blue-700 font-semibold mb-4">
-                Informations pratiques
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 lg:p-7 lg:sticky lg:top-24 shadow-sm">
+
+              <h2 className="text-xs uppercase tracking-[0.15em] text-blue-700 font-semibold mb-6">
+                Informations
               </h2>
-              
-              <div className="space-y-4">
-                
-                {/*  Date */}
-                <div className="flex items-start space-x-3">
-                  <div className="w-9 h-9 bg-blue-950 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Calendar size={18} className="text-white" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-0.5">
-                      Date
-                    </p>
-                    <p className="text-sm text-gray-900 font-medium capitalize">
-                      {formatDate(event.date)}
-                    </p>
-                  </div>
-                </div>
 
-                {/*  Horaires */}
-                <div className="flex items-start space-x-3">
-                  <div className="w-9 h-9 bg-blue-950 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Clock size={18} className="text-white" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-0.5">
-                      Horaires
-                    </p>
-                    <p className="text-sm text-gray-900 font-medium">
-                      {formatTime(event.heure_debut)}
-                      {event.heure_fin && ` - ${formatTime(event.heure_fin)}`}
-                    </p>
-                  </div>
-                </div>
+              <div className="space-y-5">
 
-                {/*  Lieu */}
-                <div className="flex items-start space-x-3">
-                  <div className="w-9 h-9 bg-blue-950 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <MapPin size={18} className="text-white" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-0.5">
-                      Lieu
-                    </p>
-                    <p className="text-sm text-gray-900 font-medium">
-                      {event.lieu}
-                    </p>
-                  </div>
-                </div>
+                <InfoRow
+                  icon={<Calendar size={16} className="text-blue-700" />}
+                  label="Date"
+                  value={formatDate(event.date)}
+                  capitalize
+                />
 
-                {/*  Places */}
+                <InfoRow
+                  icon={<Clock size={16} className="text-blue-700" />}
+                  label="Horaires"
+                  value={
+                    formatTime(event.heure_debut) +
+                    (event.heure_fin ? ` - ${formatTime(event.heure_fin)}` : "")
+                  }
+                />
+
+                <InfoRow
+                  icon={<MapPin size={16} className="text-blue-700" />}
+                  label="Lieu"
+                  value={event.lieu}
+                />
+
                 {event.nombre_participants && (
-                  <div className="flex items-start space-x-3">
-                    <div className="w-9 h-9 bg-blue-950 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Users size={18} className="text-white" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-0.5">
-                        Places disponibles
-                      </p>
-                      <p className="text-sm text-gray-900 font-medium">
-                        {event.nombre_participants} personnes
-                      </p>
-                    </div>
-                  </div>
+                  <InfoRow
+                    icon={<Users size={16} className="text-blue-700" />}
+                    label="Places"
+                    value={`${event.nombre_participants} personnes`}
+                  />
                 )}
 
-                {/*  Tarif */}
                 {event.tarif !== null && (
-                  <div className="flex items-start space-x-3">
-                    <div className="w-9 h-9 bg-blue-950 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Euro size={18} className="text-white" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-0.5">
-                        Tarif
-                      </p>
-                      <p className="text-sm text-gray-900 font-medium">
-                        {parseFloat(event.tarif) === 0 ? "Gratuit" : `${event.tarif}€`}
-                      </p>
-                    </div>
-                  </div>
+                  <InfoRow
+                    icon={<Euro size={16} className="text-blue-700" />}
+                    label="Tarif"
+                    value={
+                      parseFloat(event.tarif) === 0
+                        ? "Gratuit"
+                        : `${event.tarif}€`
+                    }
+                  />
                 )}
               </div>
 
-              {/*  inscription */}
-              {isAuthenticated ? (
-  // ✅ Connecté : ouvre la modal
-  <button
-    type="button"
-    onClick={() => setShowModal(true)}
-    className="mt-6 w-full bg-blue-950 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg"
-  >
-    S'inscrire à l'événement
-  </button>
-                  ) : (
-                    //Non connecté : invite à se connecter
-                    <div className="mt-6 space-y-3">
+              {/* Séparateur subtil avant le CTA */}
+              <div className="mt-7 pt-6 border-t border-gray-100">
+                {isAuthenticated ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(true)}
+                    className="w-full bg-blue-950 hover:bg-blue-800 text-white py-3 rounded-lg font-semibold transition-colors"
+                  >
+                    S'inscrire à l'événement
+                  </button>
+                ) : (
+                  <div className="space-y-3">
+                    <Link
+                      to="/login"
+                      state={{
+                        from: `/events/${event.id}`,
+                        message:
+                          "Connectez-vous pour vous inscrire à cet événement",
+                      }}
+                      className="w-full bg-blue-950 hover:bg-blue-800 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2"
+                    >
+                      <LogIn size={16} />
+                      <span>Se connecter pour s'inscrire</span>
+                    </Link>
+                    <p className="text-center text-xs text-gray-500 leading-relaxed">
+                      Pas encore de compte ?{" "}
                       <Link
-                        to="/login"
-                        state={{ from: `/events/${event.id}`, message: "Connectez-vous pour vous inscrire à cet événement" }}
-                        className="w-full bg-blue-950 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+                        to="/register"
+                        state={{
+                          from: `/events/${event.id}`,
+                          message:
+                            "Votre compte est créé ! Connectez-vous pour finaliser votre inscription.",
+                        }}
+                        className="text-blue-700 hover:underline font-medium"
                       >
-                        <LogIn size={18} />
-                        <span>Se connecter pour s'inscrire</span>
+                        Créer un compte
                       </Link>
-                      <p className="text-center text-xs text-gray-500">
-                        Pas encore de compte ?{" "}
-                        <Link 
-                          to="/register" 
-                          state={{ 
-                            from: `/events/${event.id}`, 
-                            message: "Votre compte est créé ! Connectez-vous pour finaliser votre inscription." 
-                          }}
-                          className="text-blue-700 hover:underline font-medium"
-                        >
-                          S'inscrire gratuitement
-                        </Link>
-                      </p>
-                    </div>
-                  )}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </section>
-      {/* 🪟 Modal de réservation */}
+
+      {/* Modal de réservation */}
       {showModal && (
         <ReservationModal
           event={event}
           onClose={() => setShowModal(false)}
         />
       )}
+    </div>
+  );
+}
+
+/**
+ * Ligne d'information dans la sidebar
+ * Style aéré : icône légère sur fond clair, typo discrète
+ */
+interface InfoRowProps {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  capitalize?: boolean;
+}
+
+function InfoRow({ icon, label, value, capitalize }: InfoRowProps) {
+  return (
+    <div className="flex items-start space-x-3">
+      <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+        {icon}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs text-gray-500 font-medium mb-0.5">
+          {label}
+        </p>
+        <p
+          className={`text-sm text-gray-900 font-medium break-words ${
+            capitalize ? "capitalize" : ""
+          }`}
+        >
+          {value}
+        </p>
+      </div>
     </div>
   );
 }
