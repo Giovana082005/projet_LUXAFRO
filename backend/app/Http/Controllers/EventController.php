@@ -177,4 +177,5 @@ class EventController extends Controller
             'categories' => $event->categories
         ]);
     }
+   
 }

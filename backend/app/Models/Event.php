@@ -16,7 +16,12 @@ class Event extends Model
         'lieu',
         'pour_enfant',
         'nombre_participants',
+        'reserved_places',
         'tarif',
+    ];
+
+    protected $appends = [
+    'places_restantes'
     ];
 
     // Cast automatique des types
@@ -44,5 +49,17 @@ class Event extends Model
     public function photos()
     {
         return $this->hasMany(EventPhoto::class);
+    }
+
+     /*
+    |--------------------------------------------------------------------------
+    | Accessors
+    |--------------------------------------------------------------------------
+    */
+
+    public function getPlacesRestantesAttribute()
+    {
+        return $this->nombre_participants
+            - $this->reserved_places;
     }
 }

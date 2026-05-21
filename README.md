@@ -42,7 +42,7 @@ docker compose exec laravel php artisan migrate
 
 ### 6. Accéder aux services
 
-- **phpMyAdmin** : http://localhost:8080
+- **phpMyAdmin** : http://localhost:8081
 - **Backend Laravel** : http://localhost:8000 
 - **Frontend React** : http://localhost:5173 
 
@@ -60,9 +60,6 @@ luxafro/
 
 ### créer un controller
 docker compose exec laravel php artisan make:controller nom_du_controller
-
-###  démarrer le docker
-docker-compose up -d
 
 ###  Voir les conténeurs en cours 
 docker ps
@@ -92,3 +89,6 @@ docker compose exec laravel php artisan make:migration NOM_DU_FICHIER
 ### feeding the databse with seeds
 docker compose exec laravel php artisan db:seed
 php artisan migrate:fresh --seed
+
+composer require laravel/reverb
+php artisan reverb:install
