@@ -16,7 +16,7 @@ use App\Http\Controllers\ContactController;
 |--------------------------------------------------------------------------
 */
 Route::middleware(['web'])->group(function () {
-    
+
     //AUTH
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
@@ -32,9 +32,8 @@ Route::middleware(['web'])->group(function () {
     Route::get('/events', [EventController::class, 'index']);
     Route::get('/events/{id}', [EventController::class, 'show']);
 
-    //formulaire de contact
-    Route::post('/contacts',[ContactController::class, 'store']);
-    Route::get('/contacts',[ContactController::class, 'index']);
+    // CONTACT — seulement l'envoi du formulaire est public
+    Route::post('/contacts', [ContactController::class, 'store']);
 });
 
 
@@ -49,11 +48,8 @@ Route::middleware(['web', 'auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::post('/reservations', [ReservationController::class, 'store']);
-
     Route::get('/reservations/me', [ReservationController::class, 'myReservations']);
-
     Route::get('/reservations/{id}', [ReservationController::class, 'show']);
-
     Route::post('/reservations/{id}', [ReservationController::class, 'cancel']);
 
     /*
@@ -82,6 +78,14 @@ Route::middleware(['web', 'auth:sanctum'])->group(function () {
         // Photos
         Route::post('/events/{id}/photos', [EventPhotoController::class, 'store']);
         Route::delete('/photos/{id}', [EventPhotoController::class, 'destroy']);
+
+        // ============================================
+        // CONTACTS (lecture + gestion admin uniquement)
+        // ============================================
+        Route::get('/contacts', [ContactController::class, 'index']);
+        Route::get('/contacts/{id}', [ContactController::class, 'getContactDetails']);
+        Route::patch('/contacts/{id}/read', [ContactController::class, 'markAsRead']);
+        Route::delete('/contacts/{id}', [ContactController::class, 'destroy']);
 
         //TEST ADMIN
         Route::get('/admin', function () {
