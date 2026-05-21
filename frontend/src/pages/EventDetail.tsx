@@ -6,7 +6,7 @@ import {
   Users,
   Baby,
   AlertCircle,
-  LogIn
+  LogIn,
 } from "lucide-react";
 
 import {
@@ -205,7 +205,7 @@ function EventDetail() {
 
           <Link
             to="/events"
-            className="inline-flex items-center space-x-2 bg-blue-950 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            className="inline-flex items-center space-x-2 bg-blue-950 hover:bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
           >
 
             <ArrowLeft size={18} />
@@ -313,7 +313,7 @@ function EventDetail() {
 
               <Link
                 to="/events"
-                className="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20"
+                className="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20"
               >
 
                 <ArrowLeft size={16} />
@@ -372,7 +372,7 @@ function EventDetail() {
 
               <Link
                 to="/events"
-                className="inline-flex items-center space-x-2 text-white/80 hover:text-white text-sm font-medium mb-6 transition-colors"
+                className="inline-flex items-center space-x-2 text-white/70 hover:text-white text-sm font-medium mb-8 transition-colors"
               >
 
                 <ArrowLeft size={16} />
@@ -573,6 +573,39 @@ function EventDetail() {
           }
         />
       )}
+    </div>
+  );
+}
+
+/**
+ * Ligne d'information dans la sidebar
+ * Style aéré : icône légère sur fond clair, typo discrète
+ */
+interface InfoRowProps {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  capitalize?: boolean;
+}
+
+function InfoRow({ icon, label, value, capitalize }: InfoRowProps) {
+  return (
+    <div className="flex items-start space-x-3">
+      <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+        {icon}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs text-gray-500 font-medium mb-0.5">
+          {label}
+        </p>
+        <p
+          className={`text-sm text-gray-900 font-medium break-words ${
+            capitalize ? "capitalize" : ""
+          }`}
+        >
+          {value}
+        </p>
+      </div>
     </div>
   );
 }

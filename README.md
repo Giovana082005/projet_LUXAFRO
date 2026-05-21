@@ -90,5 +90,9 @@ docker compose exec laravel php artisan make:migration NOM_DU_FICHIER
 docker compose exec laravel php artisan db:seed
 php artisan migrate:fresh --seed
 
+### installer reverb 
 composer require laravel/reverb
 php artisan reverb:install
+
+## lancer reverb dans le container laravel
+php artisan reverb:start --host=0.0.0.0 --port=8080
