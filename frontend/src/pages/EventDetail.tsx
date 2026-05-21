@@ -3,10 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   Calendar,
-  Clock,
-  MapPin,
   Users,
-  Euro,
   Baby,
   AlertCircle,
   LogIn
@@ -54,7 +51,7 @@ function EventDetail() {
   */
 
   const [liveEvent, setLiveEvent] =
-    useState(event);
+    useState<any>(null);
 
   /*
   |--------------------------------------------------------------------------
@@ -76,7 +73,7 @@ function EventDetail() {
 
   /*
   |--------------------------------------------------------------------------
-  | Sync event API -> state live
+  | Sync API -> state local
   |--------------------------------------------------------------------------
   */
 
@@ -99,6 +96,10 @@ function EventDetail() {
 
     if (!id) return;
 
+    console.log(
+      "Connexion au channel events"
+    );
+
     echo.channel("events")
 
       .listen(
@@ -106,23 +107,27 @@ function EventDetail() {
         (e: any) => {
 
           console.log(
-            "Event updated:",
+            "Event reçu :",
             e
           );
 
           if (
             e.eventData.id === Number(id)
           ) {
-
-             setLiveEvent((prev: any) => ({
-            ...prev,
-            ...e.eventData
-           }));
+              setLiveEvent((prev: any) => ({
+               ...prev,
+              ...e.eventData
+            }));
+         
           }
         }
       );
 
     return () => {
+
+      console.log(
+        "Déconnexion channel events"
+      );
 
       echo.leave("events");
     };
@@ -150,21 +155,6 @@ function EventDetail() {
         year: "numeric",
       }
     );
-  };
-
-  /*
-  |--------------------------------------------------------------------------
-  | Format heure
-  |--------------------------------------------------------------------------
-  */
-
-  const formatTime = (
-    timeString: string | null
-  ) => {
-
-    if (!timeString) return "";
-
-    return timeString.substring(0, 5);
   };
 
   /*
@@ -271,6 +261,17 @@ function EventDetail() {
 
   /*
   |--------------------------------------------------------------------------
+  | Calcul places restantes
+  |--------------------------------------------------------------------------
+  */
+
+  const placesRestantes =
+
+    liveEvent.nombre_participants
+    - liveEvent.reserved_places;
+
+  /*
+  |--------------------------------------------------------------------------
   | Photo principale
   |--------------------------------------------------------------------------
   */
@@ -335,7 +336,7 @@ function EventDetail() {
                   <div className="flex flex-wrap gap-2 mb-3">
 
                     {liveEvent.categories.map(
-                      (cat) => (
+                      (cat: any) => (
 
                         <span
                           key={cat.id}
@@ -500,7 +501,7 @@ function EventDetail() {
 
                     <p className="text-sm text-gray-900 font-medium">
 
-                      {liveEvent.places_restantes}
+                      {placesRestantes}
 
                     </p>
 
@@ -513,7 +514,7 @@ function EventDetail() {
 
               {isAuthenticated ? (
 
-                liveEvent.places_restantes > 0 ? (
+                placesRestantes > 0 ? (
 
                   <button
                     type="button"
