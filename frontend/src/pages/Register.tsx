@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useNavigate, Link ,useLocation} from "react-router-dom";
-
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
 import Spinner from "../components/Spinner";
 
@@ -8,26 +8,22 @@ function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
-  //Récupère le contexte de navigation
-  // (ex: si on vient d'une page d'événement qui demandait une connexion)
   const location = useLocation();
   const fromUrl = location.state?.from as string | undefined;
-  const fromMessage = location.state?.message as string | undefined;
 
   const handleRegister = async () => {
     setLoading(true);
     setMessage("");
 
     try {
-      // Récupérer le CSRF cookie
       await getCsrfCookie();
 
-      // Faire la requête d'inscription
       const res = await fetch(`${API_URL}/api/register`, {
         method: "POST",
         credentials: "include",
@@ -41,20 +37,16 @@ function Register() {
         setMessage(data.message || "Erreur inscription");
       } else {
         setSuccess(true);
-        setMessage("Compte créé avec succès !");
-        //Rediriger vers le login
         setTimeout(() => {
-        // On transmet le state original vers login
-        // pour que l'utilisateur soit redirigé vers l'événement après connexion
-        navigate("/login", {
-          state: {
-            from: fromUrl,
-            message: fromUrl
-              ? "Votre compte est créé ! Connectez-vous pour finaliser votre inscription."
-              : undefined,
-          },
-        });
-      }, 2000);
+          navigate("/login", {
+            state: {
+              from: fromUrl,
+              message: fromUrl
+                ? "Votre compte est créé ! Connectez-vous pour finaliser votre inscription."
+                : undefined,
+            },
+          });
+        }, 2000);
       }
     } catch {
       setMessage("Erreur serveur");
@@ -62,7 +54,7 @@ function Register() {
       setLoading(false);
     }
   };
-     
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md text-white">
@@ -89,29 +81,39 @@ function Register() {
                 className="w-full p-3 border border-gray-700 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
               />
 
-              <input
-                type="password"
-                placeholder="Mot de passe (min. 6 caractères)"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
-                className="w-full p-3 border border-gray-700 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
-              />
+              {/* Champ mot de passe avec toggle */}
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Mot de passe (min. 6 caractères)"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                  className="w-full p-3 pr-11 border border-gray-700 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                  aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
 
               <button
                 onClick={handleRegister}
                 disabled={loading}
-                 className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-semibold transition disabled:bg-gray-700"
-          >
-              
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-semibold transition disabled:bg-gray-700"
+              >
                 {loading ? (
-              <div className="flex items-center justify-center space-x-2">
-                <Spinner size="sm" color="blue" />
-                <span>Inscription...</span>
-              </div>
-            ) : (
-              "S'inscrire"
-            )}
+                  <div className="flex items-center justify-center space-x-2">
+                    <Spinner size="sm" color="blue" />
+                    <span>Inscription...</span>
+                  </div>
+                ) : (
+                  "S'inscrire"
+                )}
               </button>
             </div>
 
@@ -129,8 +131,8 @@ function Register() {
         ) : (
           <div className="text-center space-y-4">
             <div className="bg-green-50 border border-green-300 rounded-lg p-6">
-              <h3 className="text-2xl font-semibold mb-2">
-                 Inscription réussie !
+              <h3 className="text-2xl font-semibold mb-2 text-gray-900">
+                Inscription réussie !
               </h3>
               <p className="text-gray-700">
                 Votre compte a été créé avec succès.
