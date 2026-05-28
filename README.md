@@ -95,4 +95,4 @@ composer require laravel/reverb
 php artisan reverb:install
 
 ## lancer reverb dans le container laravel
-php artisan reverb:start --host=0.0.0.0 --port=8080
+docker compose exec laravel php artisan reverb:start --host=0.0.0.0 --port=8080

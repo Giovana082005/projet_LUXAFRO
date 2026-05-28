@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { Event } from "../types/Event";
 import type { RecommendedEvent } from "../types/RecommendedEvent";
-
+import cultureEventImage from "../assets/images/events/default.jpg";
 // ============================================================
 // MOCK — à retirer une fois l'endpoint backend disponible
 // ============================================================
@@ -29,7 +29,9 @@ const MOCK_RECOMMENDED_EVENT: RecommendedEvent = {
         id: 1,
         event_id: 99,
         image_path:
-          "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=2000&q=80",
+          //"https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=2000&q=80",
+          "/images/events/exposition.jpg",
+          //cultureEventImage,
       },
     ],
     pour_enfant: true,

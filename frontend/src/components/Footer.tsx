@@ -15,9 +15,11 @@ function Footer() {
           <div className="space-y-4">
             <Link to="/" className="flex items-center space-x-2">
               <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">Lx</span>
-              </div>
-              <span className="text-white font-bold text-xl">Luxafro</span>
+              <span className="font-bold text-xl bg-gradient-to-r from-white via-yellow-200 to-yellow-500 bg-clip-text text-transparent">LX</span>
+            </div>
+          <span className="font-bold text-xl bg-gradient-to-r from-white via-yellow-200 to-yellow-500 bg-clip-text text-transparent">
+            LUXAFRO
+          </span>
             </Link>
             <p className="text-sm text-gray-400">
               Plateforme culturelle camerounaise. Découvrez les événements, recettes traditionnelles et la richesse de notre culture.

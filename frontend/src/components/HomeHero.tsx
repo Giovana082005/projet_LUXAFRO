@@ -44,7 +44,7 @@ function HomeHero({ recommendedEvent, loading = false }: HomeHeroProps) {
   // Sinon on passe par getImageUrl pour préfixer avec l'URL du backend
   const rawPath = event.photos?.[0]?.image_path;
   const photoUrl = rawPath
-    ? rawPath.startsWith("http")
+    ? rawPath.startsWith("http") || rawPath.startsWith("/")
       ? rawPath
       : getImageUrl(rawPath)
     : null;
@@ -83,7 +83,7 @@ function HomeHero({ recommendedEvent, loading = false }: HomeHeroProps) {
         ></div>
       )}
 
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-950/95 via-blue-950/70 to-blue-950/30"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-950/85 via-blue-950/50 to-blue-950/10"></div>
       <div className="absolute inset-0 bg-gradient-to-t from-blue-950/80 via-transparent to-transparent"></div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
