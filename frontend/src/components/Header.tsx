@@ -1,24 +1,23 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, LogIn, LogOut, User as UserIcon, Shield,Ticket } from "lucide-react";
+import { Menu, X, LogIn, LogOut, User as UserIcon, Shield, Ticket } from "lucide-react";
 import { API_URL, getCsrfCookie, getAuthHeaders } from "../config/api";
-import { useAuth } from "../hooks/useAuth"; // 🆕 Source unique de vérité
+import { useAuth } from "../hooks/useAuth";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-
-  //Utilisation du hook centralisé 
-  // 'refresh' permet de re-vérifier l'auth après login/logout
+//Utilisation du hook centralisé 
+// 'refresh' permet de re-vérifier l'auth après login/logout
   const { user, refresh } = useAuth();
 
-  //Fermer le menu mobile quand on change de page
+ //Fermer le menu mobile quand on change de page
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
 
-  //Déconnexion - utilise refresh() pour synchroniser tous les composants
+//Déconnexion - utilise refresh() pour synchroniser tous les composants
   const handleLogout = async () => {
     try {
       await getCsrfCookie();
@@ -48,19 +47,19 @@ function Header() {
     <header className="sticky top-0 z-50 bg-gray-900 border-b border-gray-800 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          
-          {/*Logo */}
+
+          {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-              <span className="font-bold text-xl hidden sm:block bg-gradient-to-r from-white via-yellow-200 to-yellow-500 bg-clip-text text-transparent">LX</span>
+            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+              <span className="font-bold text-xl bg-gradient-to-r from-white via-yellow-200 to-yellow-500 bg-clip-text text-transparent">LX</span>
             </div>
-          <span className="font-bold text-xl hidden sm:block bg-gradient-to-r from-white via-yellow-200 to-yellow-500 bg-clip-text text-transparent">
-            LUXAFRO
-          </span>
+            <span className="font-bold text-xl bg-gradient-to-r from-white via-yellow-200 to-yellow-500 bg-clip-text text-transparent">
+              LUXAFRO
+            </span>
           </Link>
 
-          {/* Navigation desktop */}
-          <nav className="hidden md:flex items-center space-x-8">
+          {/* Navigation desktop — visible à partir de lg (1024px) */}
+          <nav className="hidden lg:flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link
                 key={link.to}
@@ -76,11 +75,10 @@ function Header() {
             ))}
           </nav>
 
-          {/* Actions à droite (Desktop) */}
-          <div className="hidden md:flex items-center space-x-4">
+          {/* Actions à droite (Desktop) — visible à partir de lg (1024px) */}
+          <div className="hidden lg:flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-3">
-                {/* Lien Mes réservations */}
                 <Link
                   to="/mes-reservations"
                   className="flex items-center space-x-2 text-gray-300 hover:text-white text-sm font-medium transition-colors"
@@ -88,8 +86,7 @@ function Header() {
                   <Ticket size={16} />
                   <span>Mes réservations</span>
                 </Link>
-                
-                {/*Lien Admin (visible uniquement pour les admins) */}
+
                 {user.role === "administrateur" && (
                   <Link
                     to="/admin"
@@ -104,7 +101,7 @@ function Header() {
                   <UserIcon size={18} />
                   <span className="text-sm">{user.name}</span>
                 </div>
-                
+
                 <button
                   onClick={handleLogout}
                   className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -124,19 +121,19 @@ function Header() {
             )}
           </div>
 
-          {/* Bouton burger menu (mobile) */}
+          {/* Bouton burger — visible en dessous de lg (< 1024px) */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden text-white hover:text-blue-400 transition-colors"
+            className="lg:hidden text-white hover:text-blue-400 transition-colors"
             aria-label="Menu"
           >
             {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
         </div>
 
-        {/*  Menu mobile */}
+        {/* Menu mobile/tablette — visible en dessous de lg */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-800">
+          <div className="lg:hidden py-4 border-t border-gray-800">
             <nav className="flex flex-col space-y-3">
               {navLinks.map((link) => (
                 <Link
@@ -155,7 +152,6 @@ function Header() {
               <div className="border-t border-gray-800 pt-3 mt-3">
                 {user ? (
                   <div className="space-y-2">
-                    {/*Mes réservations mobile */}
                     <Link
                       to="/mes-reservations"
                       className="flex items-center space-x-2 text-gray-300 hover:bg-gray-800 hover:text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -163,8 +159,7 @@ function Header() {
                       <Ticket size={16} />
                       <span>Mes réservations</span>
                     </Link>
-                    
-                    {/*Lien Admin mobile */}
+
                     {user.role === "administrateur" && (
                       <Link
                         to="/admin"
@@ -179,7 +174,7 @@ function Header() {
                       <UserIcon size={18} />
                       <span className="text-sm">{user.name}</span>
                     </div>
-                    
+
                     <button
                       onClick={handleLogout}
                       className="w-full flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
