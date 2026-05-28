@@ -33,3 +33,6 @@ export const getImageUrl = (path: string | null | undefined): string => {
   if (!path) return "";
   return `${API_URL}/storage/${path}`;
 };
+ //Image par défaut des évenements
+export const FALLBACK_IMAGE_URL = import.meta.env.VITE_FALLBACK_IMAGE_URL ?? 
+  "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80"; // valeur de secours si .env absent

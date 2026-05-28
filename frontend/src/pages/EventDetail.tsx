@@ -16,7 +16,7 @@ import {
 
 import { useEvent } from "../hooks/useEvent";
 
-import { getImageUrl } from "../config/api";
+import { getImageUrl,FALLBACK_IMAGE_URL } from "../config/api";
 
 import Spinner from "../components/Spinner";
 
@@ -285,7 +285,7 @@ function EventDetail() {
           liveEvent.photos[0].image_path
         )
 
-      : null;
+      : FALLBACK_IMAGE_URL;
 
   return (
 
@@ -313,7 +313,7 @@ function EventDetail() {
 
               <Link
                 to="/events"
-                className="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20"
+                className="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-gray-950 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20"
               >
 
                 <ArrowLeft size={16} />
@@ -417,7 +417,7 @@ function EventDetail() {
 
             {liveEvent.pour_enfant && (
 
-              <div className="mt-6 inline-flex items-center space-x-2 bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded-lg">
+              <div className="mt-6 inline-flex items-center space-x-2 bg-yellow-50 border border-red-200 text-red-500 px-4 py-2 rounded-lg">
 
                 <Baby size={18} />
 
@@ -528,7 +528,8 @@ function EventDetail() {
 
                 ) : (
 
-                  <div className="mt-6 w-full bg-red-100 text-red-700 py-3 rounded-lg font-semibold text-center">
+                  <div className="mt-6 inline-flex items-center space-x-2 bg-red-200 border border-red-200 text-red-500 px-4 py-2 rounded-lg">
+
 
                     Événement complet
 

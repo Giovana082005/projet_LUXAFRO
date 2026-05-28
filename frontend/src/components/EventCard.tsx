@@ -1,88 +1,92 @@
-import { Calendar, MapPin, Users, Euro, Baby, Clock } from "lucide-react";
+import { Calendar, MapPin, Euro, Baby, ArrowRight } from "lucide-react";
 import type { Event } from "../types/Event";
-import { getImageUrl } from "../config/api";
+import { getImageUrl,FALLBACK_IMAGE_URL } from "../config/api";
 import { Link } from "react-router-dom";
 
 interface EventCardProps {
   event: Event;
 }
-
+  
 function EventCard({ event }: EventCardProps) {
-  //Formater la date en français
+  // Date courte façon "30 mai 2026"
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("fr-FR", {
       day: "numeric",
-      month: "long",
+      month: "short",
       year: "numeric",
     });
   };
 
-  //Formater l'heure (HH:mm)
-  const formatTime = (timeString: string | null) => {
-    if (!timeString) return "";
-    return timeString.substring(0, 5);
+  // Jour + mois isolés pour la pastille calendrier
+  const dateParts = (dateString: string) => {
+    const date = new Date(dateString);
+    return {
+      day: date.toLocaleDateString("fr-FR", { day: "2-digit" }),
+      month: date
+        .toLocaleDateString("fr-FR", { month: "short" })
+        .replace(".", "")
+        .toUpperCase(),
+    };
   };
 
-  //Format combiné des horaires
-  const formatHoraires = () => {
-    const debut = formatTime(event.heure_debut);
-    const fin = formatTime(event.heure_fin);
-    
-    if (debut && fin) {
-      return `${debut} - ${fin}`;
-    }
-    return debut;
-  };
+  const { day, month } = dateParts(event.date);
 
-  //  Récupérer la photo principale (la première du tableau)
-  const photoUrl = event.photos && event.photos.length > 0
-    ? getImageUrl(event.photos[0].image_path)
-    : null;
+  // Photo principale ou image générique
+  const photoUrl =
+    event.photos && event.photos.length > 0
+      ? getImageUrl(event.photos[0].image_path)
+      : FALLBACK_IMAGE_URL;// Image générique de secours
+
+  const isFree = event.tarif !== null && parseFloat(event.tarif) === 0;
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-blue-50">
-      
-      {/* Header avec photo OU titre stylisé */}
-      {photoUrl ? (
-        // 📷 Avec photo : image en fond + overlay avec titre
-        <div className="relative h-48 overflow-hidden flex-shrink-0">
-          <img
-            src={photoUrl}
-            alt={event.nom}
-            className="w-full h-full object-cover"
-          />
-          {/* Overlay dégradé pour la lisibilité du titre */}
-          <div className="absolute inset-0 bg-gradient-to-t from-blue-950/80 to-transparent flex items-end p-4">
-            <h2 className="text-xl font-semibold text-white">
-              {event.nom}
-            </h2>
-          </div>
+    <Link
+      to={`/events/${event.id}`}
+      className="group relative block rounded-2xl overflow-hidden shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 h-[420px]"
+    >
+      {/* Image plein cadre */}
+      <img
+        src={photoUrl}
+        alt={event.nom}
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+      />
+
+      {/* Dégradé bleu marine (cohérent avec le Hero) */}
+      <div className="absolute inset-0 bg-gradient-to-t from-blue-950 via-blue-950/60 to-transparent" />
+
+      {/* Pastille date (haut gauche) */}
+      <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-xl px-3 py-2 text-center shadow-lg leading-none">
+        <div className="text-xl font-bold text-blue-950">{day}</div>
+        <div className="text-[10px] font-semibold text-blue-700 tracking-wide">
+          {month}
         </div>
-      ) : (
-        // Sans photo : header bleu marine uni avec titre
-        <div className="h-28 bg-blue-950 flex items-center justify-center flex-shrink-0 px-4">
-          <h2 className="text-2xl font-semibold text-white text-center">
-            {event.nom}
-          </h2>
+      </div>
+
+      {/* Badge tarif (haut droite) */}
+      {event.tarif !== null && (
+        <div className="absolute top-4 right-4 bg-white/15 backdrop-blur-md border border-white/25 text-yellow-500 px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg">
+          {isFree ? "Gratuit" : `${event.tarif}€`}
         </div>
       )}
 
-      {/* Contenu */}
-      <div className="p-6 flex flex-col flex-grow">
-        
-        {/* Description */}
-        <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-          {event.description}
-        </p>
+      {/* Badge enfants (sous le tarif, si applicable) */}
+      {event.pour_enfant && (
+        <div className="absolute top-16 right-4 inline-flex items-center gap-1 bg-red-400 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-xs font-medium shadow-lg">
+          <Baby size={13} />
+          <span>Enfants</span>
+        </div>
+      )}
 
-        {/*  Badges de catégories - utilise cat.nom maintenant */}
+      {/* Contenu en overlay (bas) */}
+      <div className="absolute bottom-0 inset-x-0 p-5 text-white">
+        {/* Catégories */}
         {event.categories && event.categories.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {event.categories.map((cat) => (
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {event.categories.slice(0, 3).map((cat) => (
               <span
                 key={cat.id}
-                className="bg-blue-50 text-blue-900 px-2.5 py-1 rounded-full text-xs font-semibold"
+                className="bg-white/15 backdrop-blur-sm border border-white/20 px-2.5 py-0.5 rounded-full text-[11px] font-medium"
               >
                 {cat.nom}
               </span>
@@ -90,65 +94,38 @@ function EventCard({ event }: EventCardProps) {
           </div>
         )}
 
-        {/*  Informations */}
-        <div className="space-y-2 text-sm text-gray-700 mb-4">
-          
-          {/*  Date */}
-          <div className="flex items-center space-x-2">
-            <Calendar size={16} className="text-blue-700 flex-shrink-0" />
+        {/* Titre */}
+        <h2 className="text-xl font-semibold leading-tight mb-2 line-clamp-2">
+          {event.nom}
+        </h2>
+
+        {/* Description courte */}
+        <p className="text-white/75 text-sm leading-snug mb-4 line-clamp-2">
+          {event.description}
+        </p>
+
+        {/* Essentiel : date + lieu */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/90 mb-4">
+          <div className="flex items-center gap-1.5">
+            <Calendar size={15} className="text-white/60" />
             <span>{formatDate(event.date)}</span>
           </div>
-
-          {/*  Horaires (début + fin si disponible) */}
-          <div className="flex items-center space-x-2">
-            <Clock size={16} className="text-blue-700 flex-shrink-0" />
-            <span>{formatHoraires()}</span>
-          </div>
-
-          {/*  Lieu */}
-          <div className="flex items-center space-x-2">
-            <MapPin size={16} className="text-blue-700 flex-shrink-0" />
+          <div className="flex items-center gap-1.5">
+            <MapPin size={15} className="text-white/60" />
             <span>{event.lieu}</span>
           </div>
-
-          {/*  Places */}
-          {event.nombre_participants && (
-            <div className="flex items-center space-x-2">
-              <Users size={16} className="text-blue-700 flex-shrink-0" />
-              <span>{event.nombre_participants} places</span>
-            </div>
-          )}
-
-          {/*  Tarif */}
-          {event.tarif !== null && (
-            <div className="flex items-center space-x-2">
-              <Euro size={16} className="text-blue-700 flex-shrink-0" />
-              <span>
-                {parseFloat(event.tarif) === 0
-                  ? "Gratuit"
-                  : `${event.tarif}€`}
-              </span>
-            </div>
-          )}
-
-          {/*  Adapté aux enfants */}
-          {event.pour_enfant && (
-            <div className="flex items-center space-x-2">
-              <Baby size={16} className="text-green-600 flex-shrink-0" />
-              <span className="text-green-600 font-medium">Adapté aux enfants</span>
-            </div>
-          )}
         </div>
 
-        {/*  Bouton CTA */}
-        <Link
-            to={`/events/${event.id}`}
-            className="mt-auto w-full bg-blue-950 hover:bg-blue-700 text-white py-2.5 rounded-lg font-semibold transition-colors text-center"
-          >
-            En savoir plus
-          </Link>
+        {/* CTA discret qui se révèle au survol */}
+        <div className="inline-flex items-center gap-2 text-sm font-semibold text-white group-hover:gap-3 transition-all">
+          <span>En savoir plus</span>
+          <ArrowRight
+            size={16}
+            className="transition-transform group-hover:translate-x-1"
+          />
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }
 

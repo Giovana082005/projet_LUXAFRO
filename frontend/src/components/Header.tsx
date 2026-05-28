@@ -52,11 +52,11 @@ function Header() {
           {/*Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">Lx</span>
+              <span className="font-bold text-xl hidden sm:block bg-gradient-to-r from-white via-yellow-200 to-yellow-500 bg-clip-text text-transparent">LX</span>
             </div>
-            <span className="text-white font-bold text-xl hidden sm:block">
-              Luxafro
-            </span>
+          <span className="font-bold text-xl hidden sm:block bg-gradient-to-r from-white via-yellow-200 to-yellow-500 bg-clip-text text-transparent">
+            LUXAFRO
+          </span>
           </Link>
 
           {/* Navigation desktop */}
